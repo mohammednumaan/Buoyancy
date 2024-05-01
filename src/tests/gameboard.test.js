@@ -6,13 +6,13 @@ let shipOne;
 let shipTwo;
 
 beforeEach(() => {
-    gameBoard = new Gameboard();
+  gameBoard = new Gameboard();
   shipOne = Ship.createShips()[0];
   shipTwo = Ship.createShips()[2];
 });
 
 afterEach(() => {
-    jest.restoreAllMocks()
+  jest.restoreAllMocks();
 });
 
 describe('Test: Valid coordinates for ship placement', () => {
@@ -54,13 +54,11 @@ describe('Test: Placement of Ships on the Gameboard', () => {
 
 describe('Test: Attack Ships on the Gameboard', () => {
   test('Check if ships recieve attack', () => {
-
     const spyHitFunc = jest.spyOn(shipOne, 'hit');
     gameBoard.placeShip(shipOne, 0, 0);
 
     expect(gameBoard.recieveAttack(0, 1)).toBe(true);
-    expect(spyHitFunc).toHaveBeenCalled()
-    
+    expect(spyHitFunc).toHaveBeenCalled();
   });
 
   test('Check whether the attack has missed.', () => {
@@ -68,8 +66,8 @@ describe('Test: Attack Ships on the Gameboard', () => {
     gameBoard.placeShip(shipTwo, 5, 6);
     expect(gameBoard.recieveAttack(2, 3));
     expect(spyHitFunc).toHaveBeenCalledTimes(0);
-  })
-}); 
+  });
+});
 
 describe('Test: All ships are sunk', () => {
   test('Return false if all ships are not sunk', () => {

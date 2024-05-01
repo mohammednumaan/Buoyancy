@@ -6,13 +6,13 @@ module.exports = {
   entry: {
     app: './src/index.js',
   },
-  
+
   plugins: [
     new HtmlWebpackPlugin({
-        title: 'Production',
+      title: 'Production',
     }),
   ],
-  
+
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),

@@ -1,22 +1,25 @@
-class Ship{
+class Ship {
+  constructor(length) {
+    this.length = length;
+    this.hits = 0;
+    this.vertical = false;
+  }
 
-    constructor(length){
-        this.length = length;
-        this.hits = 0;
-    }
+  static createShips() {
+    return [new Ship(2), new Ship(3), new Ship(3), new Ship(4), new Ship(5)];
+  }
 
-    static createShips(){
-        return [new Ship(2), new Ship(3), new Ship(3), new Ship(4), new Ship(5)];
-    }
+  hit() {
+    this.hits += 1;
+  }
 
-    hit(){
-        this.hits += 1
-    }
+  changeDirection() {
+    this.vertical = !this.vertical;
+  }
 
-    isSunk(){
-        return this.hits === this.length;
-    }
+  isSunk() {
+    return this.hits === this.length;
+  }
 }
 
 module.exports = Ship;
-

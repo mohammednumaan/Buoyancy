@@ -9,7 +9,8 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Production',
+      title: 'Buoyancy',
+      template: '/src/html/index.template.html',
     }),
   ],
 

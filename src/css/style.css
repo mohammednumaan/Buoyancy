@@ -1,0 +1,75 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+.header{
+    text-align: center;
+}
+
+.game-container{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.dashboard-container{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    
+    padding-left: 20px;
+    margin-top: 10vh;
+    margin-left: 10vh;
+    
+    height: 600px;
+    width: 400px;
+    
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+}
+
+.dashboard-container > h4{
+    text-align: center;
+} 
+
+.ship-overview{
+    width: 50px;
+    height: 50px;
+
+    border: 1px solid black;
+    border-radius: 7px;
+}
+
+.ship-container{
+    display: flex;
+}
+
+.board-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 56%;
+    padding: 40px;
+    margin: 0 auto;
+    margin-top: 10vh;
+
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    
+}
+.player-one > h3,
+.player-two > h3{
+    text-align: center;
+}
+
+.player-one-board,
+.player-two-board{
+    display: grid;
+    width: 500px;
+    height: 500px;
+}
+
+.board-cell{
+    border: 1px solid black;
+}

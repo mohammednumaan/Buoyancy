@@ -2,14 +2,15 @@ class Gameboard {
   constructor() {
     /* eslint-disable-next-line no-unused-vars */
     this.board = new Array(10).fill(null).map((row) => new Array(10).fill(null));
+    this.placedShipCoords = [];
     this.missedAttack = [];
     this.attackedCoords = [];
   }
 
   isValidCoords(ship, x, y) {
     for (let i = 0; i < ship.length; i++) {
-      if ((y + i >= this.board.length) || (!ship.vertical && this.board[x][y + i] !== null)) return false;
-      if ((x + i >= this.board.length) || (ship.vertical && this.board[x + i][y] !== null)) return false;
+      if (!ship.vertical && (y + i >= this.board.length || this.board[x][y + i] !== null)) return false;
+      if (ship.vertical && (x + i >= this.board.length || this.board[x + i][y] !== null)) return false;
     }
     return true;
   }
@@ -18,7 +19,15 @@ class Gameboard {
     const isValid = this.isValidCoords(ship, x, y);
     if (isValid) {
       for (let i = 0; i < ship.length; i++) {
-        (!ship.vertical) ? this.board[x][y + i] = ship : this.board[x + i][y] = ship;
+        if(!ship.vertical){
+          this.board[x][y + i] = ship
+          this.placedShipCoords.push([x, y + i])
+
+        } else{
+          this.board[x + i][y] = ship;
+          this.placedShipCoords.push([x + i, y])
+        }
+
       }
       return true;
     }

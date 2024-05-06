@@ -1,1 +1,3 @@
-import boardContainer from './js/dom';
+const { default: gameLogic } = require("./js/dom");
+
+gameLogic(false);

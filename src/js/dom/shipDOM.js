@@ -1,18 +1,20 @@
-const domHelper = require("../domInterface");
+const domHelper = require("./domInterface");
 
 class ShipDOM{
 
-    static #highlightShips(optionsObj){
-        const {domBoard, playerBoard, currentShip, x, y, isPlaced} = optionsObj;
-        const [xCoord, yCoord] = domHelper.parseCoords(x, y);
-        const isValid = playerBoard.isValidCoords(currentShip, xCoord, yCoord)
+    static #highlightShips(event, homePlayer, currentShip, forPlacement = false){
+
+        const [xCoord, yCoord] = domHelper.parseCoords(event.target.dataset.x, event.target.dataset.y);
+        const isValid = homePlayer.gameBoard.isValidCoords(currentShip, xCoord, yCoord)
     
         for(let i = 0; i < currentShip.length; i++){
-          const cell = (!currentShip.vertical) ? domHelper.findCellElement(xCoord, yCoord + i, domBoard.className) : domHelper.findCellElement(containerName, xCoord + i, yCoord, domBoard.className);
+          const cell = (!currentShip.vertical) ? domHelper.getCellElement(xCoord, yCoord + i, event.currentTarget.className) : 
+          domHelper.getCellElement(xCoord + i, yCoord, event.currentTarget.className);
     
           if(!cell) return;
+
           cell.classList.add(isValid ? 'valid' : 'invalid');
-          (isPlaced) ? cell.classList.add('placed-ship') : null;
+          if (forPlacement) cell.classList.add('placed-ship')
         }
     
     }
@@ -22,56 +24,93 @@ class ShipDOM{
       highlightedElements.forEach(element => element.classList.remove('valid', 'invalid'))
     }
 
-    static async delegateShipPlacement(){
+
+    static #delegateShipPlacement(homeDomBoard, homePlayer, currentShip, abortController){
+      
+      let isAllPlaced = false;
       return new Promise((resolve, reject) => {
         
-      })
+        const handleClick = (e) => {
+          const [xCoord, yCoord] = domHelper.parseCoords(e.target.dataset.x, e.target.dataset.y);
 
+          
+          if (homePlayer.gameBoard.isValidCoords(currentShip, xCoord, yCoord)){
+            homePlayer.gameBoard.placeShip(currentShip, xCoord, yCoord)
+            ShipDOM.#highlightShips(e, homePlayer, currentShip, true)   
+
+            isAllPlaced =  (currentShip.length === 5) ? true : false
+            
+            resolve(currentShip)
+          }
+          
+          if (isAllPlaced) {  
+            abortController.abort()
+          } 
+        }
+
+        homeDomBoard.addEventListener('click', handleClick, {once: true, signal: abortController.signal})
+
+      })
     }
+
     
     static async placeShips(player, playerBoardContainer){
-      let isAllPlaced = false;
+
       let currentShip = player.allShips[0];
       const abortController = new AbortController()
       const signal = abortController.signal;
       
-      const highlightShips = (e) => {
-        const optionsObj = {domBoard: playerBoardContainer, playerBoard: player.gameBoard, currentShip, x: e.target.dataset.x, y: e.target.dataset.y, isPlaced: false}
-        ShipDOM.#highlightShips(optionsObj)
-      }
-
+      const highlightShips = (e) => ShipDOM.#highlightShips(e, player, currentShip)
       const clearHighlight = () => ShipDOM.#clearHighlightShips(player.gameBoard)
 
       playerBoardContainer.addEventListener('mouseover', highlightShips, {signal})
       playerBoardContainer.addEventListener('mouseout', clearHighlight, {signal})
-  
-      return new Promise((resolve, reject) => {
-  
-        playerBoardContainer.addEventListener('click', (e) => {
-          const [xCoord, yCoord] = domHelper.parseCoords(e.target.dataset.x, e.target.dataset.y);
-          
-          if (player.gameBoard.isValidCoords(currentShip, xCoord, yCoord)){
+      
+      try{
 
-            player.gameBoard.placeShip(currentShip, xCoord, yCoord)
-            ShipDOM.#highlightShips({domBoard: playerBoardContainer, playerBoard: player.gameBoard, currentShip, x: e.target.dataset.x, y: e.target.dataset.y, isPlaced: true})
-            currentShip = ShipDOM.#getNextShip(player);        
-          }
-  
-          if (!player.allShips.length) {
-            isAllPlaced = true;
-            abortController.abort()
-            resolve(isAllPlaced);
-          }
-        }, {signal})
-    
+        for (let i = 0; i < player.allShips.length; i++){
+          currentShip = player.allShips[i]
+          await ShipDOM.#delegateShipPlacement(playerBoardContainer, player, currentShip, abortController)
+        
+        } 
+
+        Promise.resolve();
+
+      } catch(err){
+        console.log(err)
+      }
+    }
+
+    static attackedShipClass(cell){
+      cell.classList.add(cell.classList.contains('placed-ship') ? 'attacked-ship' : 'missed-attack')
+    }
+
+    static #delegateShipAttack(enemyDomBoard, enemyPlayer){
+
+      const abortController = new AbortController();
+      return new Promise((resolve, reject) => {
+
+
+        const handleClick = (e) => {
+
+            const [xCoord, yCoord] = domHelper.parseCoords(e.target.dataset.x, e.target.dataset.y);
+          
+            if (enemyPlayer.gameBoard.recieveAttack(xCoord, yCoord) === true){
+              ShipDOM.attackedShipClass(e.target)
+              abortController.abort()
+              resolve(e);
+            }
+
+        }
+        enemyDomBoard.addEventListener('click', handleClick, {signal: abortController.signal})
+
       })
     }
 
-    static #getNextShip(player){
-      if (!player.allShips.length) return;
-      player.allShips.shift()
-      return player.allShips[0]
+    static async attackShip(enemyDomBoard, enemyPlayer){
+      await ShipDOM.#delegateShipAttack(enemyDomBoard, enemyPlayer)
     }
+
     
 }
 

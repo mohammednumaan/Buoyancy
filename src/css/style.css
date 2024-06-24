@@ -2,14 +2,21 @@
     font-family: 'poppins';
     src: url('../assets/poppins.ttf');
 }
+
+:root{
+    --color: #b8acff;
+    --place: #957eff    ;
+}
 body{
     margin: 0;
     padding: 0;
     font-family: poppins;
+    background-color: black;
 }
 
 .header{
     text-align: center;
+    color: var(--color);
 }
 
 .game-container{
@@ -57,7 +64,7 @@ body{
     padding: 40px;
     margin-top: 10vh;
 
-    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    /* box-shadow: var(--color) 0px 2px 4px 0px, var(--color) 0px 2px 16px 0px; */
     
 }
 
@@ -67,8 +74,8 @@ body{
 
 .player-one > h4,
 .player-two > h4{
-    margin-left: 20vh ;
-    
+    margin-left: 18vh;
+    color: var(--color);
 }
 
 .player-one-board,
@@ -80,11 +87,11 @@ body{
 }
 
 .board-cell{
-    border: 1px solid black;
+    border: 1px solid var(--color);
 }
 
 .valid{
-    background-color: green;
+    background-color: #d6d1ff;
 }
 
 .invalid{
@@ -93,13 +100,14 @@ body{
 
 
 .placed-ship{
-    background-color: yellow;
+    background-color: var(--place);
 }
 
 .timeout-screen{
     display: none;
     justify-content: center;
     align-items: center;
+    color: var(--color);
 
     position: absolute;
     width: 100%;
@@ -108,9 +116,8 @@ body{
     top: 0;
     left: 0;
 
-    background-color: beige;
     backdrop-filter: blur(100px);
-    animation: fadeInAnimation ease-in-out 7s;
+    animation: fadeInAnimation ease-in 7s;
     animation-iteration-count: 1;
 
 }
@@ -121,7 +128,7 @@ body{
     }
 
     90% {
-        opacity: 0.5;
+        opacity: 1;
     }
     100% {
         opacity: 0;
@@ -133,6 +140,6 @@ body{
 }
 
 .missed-attack{
-    background-color: aqua;
+    background-color: #3130d2;
 }
 

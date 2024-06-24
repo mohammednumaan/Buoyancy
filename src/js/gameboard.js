@@ -2,9 +2,9 @@ class Gameboard {
   constructor() {
     /* eslint-disable-next-line no-unused-vars */
     this.board = new Array(10).fill(null).map((row) => new Array(10).fill(null));
-    this.placedShipCoords = [];
     this.missedAttack = [];
     this.attackedCoords = [];
+    this.allAttackCoords = [];
   }
 
   isValidCoords(ship, x, y) {
@@ -21,11 +21,9 @@ class Gameboard {
       for (let i = 0; i < ship.length; i++) {
         if(!ship.vertical){
           this.board[x][y + i] = ship
-          this.placedShipCoords.push([x, y + i])
 
         } else{
           this.board[x + i][y] = ship;
-          this.placedShipCoords.push([x + i, y])
         }
 
       }
@@ -35,13 +33,28 @@ class Gameboard {
   }
 
   recieveAttack(x, y) {
+
+    let isSameCoord = false
+    this.allAttackCoords.forEach(coord => {
+      if (coord[0] === x && coord[1] === y){
+        console.log('inside')
+        isSameCoord = true;
+      }
+    })
+
+    if (isSameCoord) return false;
+
     if (!this.board[x][y]) {
       this.missedAttack.push([x, y]);
-      return false;
+      this.allAttackCoords.push([x, y]);
+      return true;
     }
+
 
     this.board[x][y].hit();
     this.attackedCoords.push([x, y]);
+    this.allAttackCoords.push([x, y]);
+
     return true;
   }
 

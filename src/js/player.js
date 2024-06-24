@@ -2,10 +2,16 @@ const Gameboard = require('./gameboard');
 const Ship = require('./ship');
 
 class Player {
-  constructor(isAi = false) {
+  constructor(isAi = false, turn) {
     this.gameBoard = new Gameboard();
     this.allShips = Ship.createShips();
     this.isAi = isAi;
+    this.turn = turn;
+  }
+
+  changeTurn(enemyPlayer){
+    this.turn = false;
+    enemyPlayer.turn = true;
   }
 }
 

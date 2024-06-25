@@ -1,4 +1,4 @@
-import ShipDOM from './shipDOM';
+import ShipDOM, { attackShipAI } from './shipDOM';
 
 const domHelper = require('./domInterface');
 const Gameboard = require('../gameboard');
@@ -20,11 +20,11 @@ const gameLogic = async (isAi) => {
     
     domHelper.createBoards(playerOneContainer);
     await ShipDOM.placeShips(playerOne, playerOneContainer);
-    await domHelper.createTimeoutScreen()
-
+    
     
     if (!isAi){
         
+        await domHelper.createTimeoutScreen()
         playerOneDiv.style.display = 'none'
         playerTwoDiv.style.display = 'block'
         
@@ -37,7 +37,8 @@ const gameLogic = async (isAi) => {
 
         await (async () =>{
                 
-            for (;;){
+            while(true){
+                console.log('h')
                 if (playerOne.gameBoard.allShipSunk(playerOne.allShips) || playerTwo.gameBoard.allShipSunk(playerTwo.allShips)){
                     isGameOver = true
                     break
@@ -69,8 +70,37 @@ const gameLogic = async (isAi) => {
 
     else{
         domHelper.createBoards(playerTwoContainer)
-        await domHelper.createTimeoutScreen() 
+        ShipDOM.placeAIShips(playerTwo)
+
+        playerTwoDiv.style.display = 'block'
         domHelper.renderBoards(playerOneContainer, playerTwoContainer)
+
+        
+
+        await (async () => {
+            while(true){
+
+                if (playerOne.gameBoard.allShipSunk(playerOne.allShips) || playerTwo.gameBoard.allShipSunk(playerTwo.allShips)){
+                    isGameOver = true
+                    break
+                }
+
+                if (playerOne.turn){
+                    await ShipDOM.attackShip(playerTwoContainer, playerTwo)
+                    playerOne.changeTurn(playerTwo);
+                    
+                }
+
+                else{
+                    
+                    ShipDOM.attackShipAI(playerOne, playerOneContainer)
+                    playerTwo.changeTurn(playerOne)
+                }
+                domHelper.updateBoardCells(playerOneContainer.childNodes, playerTwoContainer.childNodes)
+                
+            }
+
+        })()
 
     }
     

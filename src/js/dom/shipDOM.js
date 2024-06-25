@@ -2,6 +2,9 @@ const domHelper = require("./domInterface");
 
 class ShipDOM{
 
+
+    static #generatedCoords = []
+
     static #highlightShips(event, homePlayer, currentShip, forPlacement = false){
 
         const [xCoord, yCoord] = domHelper.parseCoords(event.target.dataset.x, event.target.dataset.y);
@@ -73,9 +76,7 @@ class ShipDOM{
           await ShipDOM.#delegateShipPlacement(playerBoardContainer, player, currentShip, abortController)
         
         } 
-
         Promise.resolve();
-
       } catch(err){
         console.log(err)
       }
@@ -111,6 +112,44 @@ class ShipDOM{
       await ShipDOM.#delegateShipAttack(enemyDomBoard, enemyPlayer)
     }
 
+    static #generateRandomCoords(){
+      const coordsArr = [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
+      (!ShipDOM.#generatedCoords.includes(coordsArr)) ? ShipDOM.#generatedCoords.push(coordsArr) : ShipDOM.#generateRandomCoords();
+      return coordsArr;
+    }
+
+    static #delgateAIPlacement(currShip, enemyPlayer){
+      const [x, y] = ShipDOM.#generateRandomCoords()
+      if (!enemyPlayer.gameBoard.isValidCoords(currShip, x, y)){
+        return ShipDOM.#delgateAIPlacement(currShip, enemyPlayer)
+        
+      }
+      enemyPlayer.gameBoard.placeShip(currShip, x, y)
+      console.log(enemyPlayer.gameBoard.board )
+      
+      for (let i = 0; i < currShip.length; i++){
+        const cell = document.querySelector(`.player-two-board > [data-x="${x}"][data-y="${y + i}"]`);
+        cell.classList.add('placed-ship')
+        cell.style.backgroundColor = 'black'
+      }
+    }
+
+    static placeAIShips(enemyPlayer){
+      enemyPlayer.allShips.forEach((ship) => ShipDOM.#delgateAIPlacement(ship, enemyPlayer))
+      console.log(enemyPlayer.gameBoard.board)
+    }
+
+    static attackShipAI(enemyPlayer, enemyDomBoard){
+      const [x, y] = ShipDOM.#generateRandomCoords()
+      if (enemyPlayer.gameBoard.recieveAttack(x, y)){
+        const cell = domHelper.getCellElement(x, y, enemyDomBoard.className)
+        ShipDOM.attackedShipClass(cell)
+      }
+
+      else{
+        ShipDOM.attackShipAI(enemyPlayer, enemyDomBoard)
+      }
+    }
     
 }
 

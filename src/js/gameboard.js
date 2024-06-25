@@ -37,7 +37,6 @@ class Gameboard {
     let isSameCoord = false
     this.allAttackCoords.forEach(coord => {
       if (coord[0] === x && coord[1] === y){
-        console.log('inside')
         isSameCoord = true;
       }
     })

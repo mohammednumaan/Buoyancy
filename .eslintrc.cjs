@@ -3,6 +3,7 @@ module.exports = {
     "env": {
         "browser": true,
         "es2021": true,
+        "jest": true
     },
 
     "parserOptions": {
@@ -10,10 +11,18 @@ module.exports = {
     },
 
     "globals":{
-        "jest": true
+        "jest/globals": true
+    },
+
+    rules:{
+        "no-await-in-loop": "off",
+        "no-plusplus": "off",
+        "no-param-reassign": "off",
+        "radix": "off",
+        "no-nested-ternary": "off"
     },
 
     "root": true,
-    "extends": ["eslint:recommended", "prettier", "airbnb" ],
-    "ignorePatterns": ["node_modules/", "**/*.cjs"]
+    "extends": ["eslint:recommended", "prettier", "airbnb-base" ],
+    "ignorePatterns": ["node_modules/", "**/*.cjs", "dist/"]
 }

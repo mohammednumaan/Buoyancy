@@ -1,4 +1,4 @@
-const { default: gameLogic } = require("./js/dom/dom");
-import './css/style.css'
+import './css/style.css';
+import starterDOM from './js/dom/startedDOM';
 
-gameLogic(true);
+starterDOM();

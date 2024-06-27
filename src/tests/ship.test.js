@@ -1,14 +1,14 @@
 const Ship = require('../js/ship');
 
-let shipOne; let
-  shipTwo;
+let shipOne;
+let shipTwo;
 beforeEach(() => {
-  shipOne = Ship.createShips()[0];
-  shipTwo = Ship.createShips()[1];
+  [shipOne, shipTwo] = Ship.createShips();
 });
 
 afterEach(() => {
-  shipOne.hits, shipTwo.hits = 0;
+  shipOne.hits = 0;
+  shipTwo.hits = 0;
 });
 
 test('Check if Ship Object is Initialized Properly', () => {

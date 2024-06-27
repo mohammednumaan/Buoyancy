@@ -1,10 +1,10 @@
 @font-face {
     font-family: 'poppins';
-    src: url('../assets/poppins.ttf');
+    src: url('../assets/sohne.otf');
 }
 
 :root{
-    --color: #b8acff;
+    --color: #9e88fd;
     --place: #957eff    ;
 }
 body{
@@ -143,3 +143,34 @@ body{
     background-color: #3130d2;
 }
 
+.starter-screen{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 16vh;
+}
+
+.starter-screen-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #9e88fd;
+}   
+
+.game-mode-buttons > button{
+    width: 290px;
+    height: 30px;
+
+    background-color: #d9d4ff;
+    border: 1px solid #d9d4ff;
+    border-radius: 10px;
+
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.game-mode-buttons{
+    display: flex;
+    gap: 20px;
+}

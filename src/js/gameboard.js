@@ -8,9 +8,14 @@ class Gameboard {
   }
 
   isValidCoords(ship, x, y) {
+    if (isNaN(x) || isNaN(y)) return false;
+
     for (let i = 0; i < ship.length; i++) {
-      if (!ship.vertical && (y + i >= this.board.length || this.board[x][y + i] !== null)) return false;
-      if (ship.vertical && (x + i >= this.board.length || this.board[x + i][y] !== null)) return false;
+      if (!ship.vertical && (y + i >= this.board.length
+        || this.board[x][y + i] !== null)) return false;
+
+      if (ship.vertical && (x + i >= this.board.length
+        || this.board[x + i][y] !== null)) return false;
     }
     return true;
   }
@@ -19,13 +24,11 @@ class Gameboard {
     const isValid = this.isValidCoords(ship, x, y);
     if (isValid) {
       for (let i = 0; i < ship.length; i++) {
-        if(!ship.vertical){
-          this.board[x][y + i] = ship
-
-        } else{
+        if (!ship.vertical) {
+          this.board[x][y + i] = ship;
+        } else {
           this.board[x + i][y] = ship;
         }
-
       }
       return true;
     }
@@ -33,13 +36,12 @@ class Gameboard {
   }
 
   recieveAttack(x, y) {
-
-    let isSameCoord = false
-    this.allAttackCoords.forEach(coord => {
-      if (coord[0] === x && coord[1] === y){
+    let isSameCoord = false;
+    this.allAttackCoords.forEach((coord) => {
+      if (coord[0] === x && coord[1] === y) {
         isSameCoord = true;
       }
-    })
+    });
 
     if (isSameCoord) return false;
 
@@ -48,7 +50,6 @@ class Gameboard {
       this.allAttackCoords.push([x, y]);
       return true;
     }
-
 
     this.board[x][y].hit();
     this.attackedCoords.push([x, y]);

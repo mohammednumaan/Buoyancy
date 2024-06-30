@@ -1,22 +1,23 @@
 class domHelper {
-  static playerOneDiv = document.querySelector('.player-one');
+  static playerOneDiv = document.querySelector(".player-one");
 
-  static playerTwoDiv = document.querySelector('.player-two');
+  static playerTwoDiv = document.querySelector(".player-two");
 
-  static continueBtn = document.querySelector('.timeout-screen > button');
+  static continueBtn = document.querySelector(".timeout-screen > button");
 
-  static playerOneTitle = document.createElement('h4');
+  static playerOneTitle = document.createElement("h4");
 
-  static playerTwoTitle = document.createElement('h4');
+  static playerTwoTitle = document.createElement("h4");
 
+  /* eslint-disable no-param-reassign */
   static createBoards(playerBoard) {
-    playerBoard.style.gridTemplateColumns = 'repeat(10, 1fr)';
-    playerBoard.style.gridTemplateRows = 'repeat(10, 1fr)';
+    playerBoard.style.gridTemplateColumns = "repeat(10, 1fr)";
+    playerBoard.style.gridTemplateRows = "repeat(10, 1fr)";
 
-    for (let i = 0; i < 10; i++) {
-      for (let j = 0; j < 10; j++) {
-        const cell = document.createElement('div');
-        cell.className = 'board-cell';
+    for (let i = 0; i < 10; i += 1) {
+      for (let j = 0; j < 10; j += 1) {
+        const cell = document.createElement("div");
+        cell.className = "board-cell";
         cell.dataset.x = i;
         cell.dataset.y = j;
         playerBoard.appendChild(cell);
@@ -24,9 +25,34 @@ class domHelper {
     }
   }
 
+  static createShipContainers(homePlayer) {
+    const dashboard = document.querySelector(".dashboard-container");
+    dashboard.style.display = "flex";
+
+    for (let i = 0; i < homePlayer.allShips.length; i += 1) {
+      const shipContainer = document.createElement("div");
+      shipContainer.className = "ship-container";
+      shipContainer.draggable = true;
+      shipContainer.id = i === 2 ? 33 : homePlayer.allShips[i].length;
+      shipContainer.dataset.index = i;
+
+      for (let j = 0; j < homePlayer.allShips[i].length; j += 1) {
+        console.log("hi");
+        const shipCell = document.createElement("div");
+        shipCell.className = "board-cell";
+        shipCell.style.backgroundColor = "#957eff";
+        shipContainer.appendChild(shipCell);
+      }
+      shipContainer.addEventListener("dragstart", domHelper.#dragStartHandler);
+      dashboard.appendChild(shipContainer);
+    }
+  }
+
   static renderBoards(homeDomBoard, enemyDomBoard) {
-    [domHelper.playerOneDiv, domHelper.playerTwoDiv].forEach((div) => div.replaceChildren());
-    domHelper.playerOneTitle.textContent = 'Your Gameboard';
+    [domHelper.playerOneDiv, domHelper.playerTwoDiv].forEach((div) =>
+      div.replaceChildren(),
+    );
+    domHelper.playerOneTitle.textContent = "Your Gameboard";
     domHelper.playerTwoTitle.textContent = "Opponent's Gameboard";
 
     domHelper.playerOneDiv.replaceChildren(homeDomBoard);
@@ -35,29 +61,42 @@ class domHelper {
     domHelper.playerTwoDiv.replaceChildren(enemyDomBoard);
     domHelper.playerTwoDiv.prepend(domHelper.playerTwoTitle);
 
-    domHelper.updateBoardCells(homeDomBoard.childNodes, enemyDomBoard.childNodes);
+    domHelper.updateBoardCells(
+      homeDomBoard.childNodes,
+      enemyDomBoard.childNodes,
+    );
   }
 
   static updateBoardCells(homeDomBoard, enemyDomBoard) {
-    enemyDomBoard.forEach((cell) => cell.style.backgroundColor = (cell.classList.contains('attacked-ship')) ? '#aa2c55'
-      : (cell.classList.contains('missed-attack')) ? '#181f4e'
-        : (cell.classList.contains('placed-ship')) ? 'black' : 'black');
+    enemyDomBoard.forEach((cell) => {
+      cell.style.backgroundColor = cell.classList.contains("attacked-ship")
+        ? "#aa2c55"
+        : cell.classList.contains("missed-attack")
+          ? "#181f4e"
+          : cell.classList.contains("placed-ship")
+            ? "black"
+            : "black";
+    });
 
     homeDomBoard.forEach((cell) => {
-      cell.style.backgroundColor = (cell.classList.contains('attacked-ship')) ? '#aa2c55'
-        : (cell.classList.contains('missed-attack')) ? '#181f4e'
-          : (cell.classList.contains('placed-ship')) ? '#957eff' : 'black';
+      cell.style.backgroundColor = cell.classList.contains("attacked-ship")
+        ? "#aa2c55"
+        : cell.classList.contains("missed-attack")
+          ? "#181f4e"
+          : cell.classList.contains("placed-ship")
+            ? "#957eff"
+            : "black";
     });
   }
 
   static createTimeoutScreen() {
     let count = 4;
-    const timeoutScreen = document.querySelector('.timeout-screen');
+    const timeoutScreen = document.querySelector(".timeout-screen");
 
     return new Promise((resolve) => {
       setTimeout(() => {
-        timeoutScreen.style.display = 'flex';
-        domHelper.continueBtn.display = 'flex';
+        timeoutScreen.style.display = "flex";
+        domHelper.continueBtn.display = "flex";
       }, 1000);
       timeoutScreen.textContent = `Hand it over: ${count}!`;
 
@@ -67,7 +106,7 @@ class domHelper {
 
         if (count === 0) {
           clearInterval(timer);
-          timeoutScreen.style.display = 'none';
+          timeoutScreen.style.display = "none";
           resolve();
         }
       }, 1000);
@@ -75,7 +114,9 @@ class domHelper {
   }
 
   static getCellElement(x, y, boardClassName) {
-    return document.querySelector(`.${boardClassName} > [data-x="${x}"][data-y="${y}"]`);
+    return document.querySelector(
+      `.${boardClassName} > [data-x="${x}"][data-y="${y}"]`,
+    );
   }
 
   static getCellCoords(cell) {
@@ -83,7 +124,13 @@ class domHelper {
   }
 
   static parseCoords(x, y) {
-    return [parseInt(x), parseInt(y)];
+    return [parseInt(x, 10), parseInt(y, 10)];
+  }
+
+  static #dragStartHandler(e) {
+    e.dataTransfer.setData("application/my-app", e.target.id);
+    e.dataTransfer.setData("application/index", e.target.dataset.index);
+    e.dataTransfer.effectAllowed = "move";
   }
 }
 

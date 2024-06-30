@@ -16,10 +16,9 @@ module.exports = {
 
     rules:{
         "no-await-in-loop": "off",
-        "no-plusplus": "off",
-        "no-param-reassign": "off",
-        "radix": "off",
-        "no-nested-ternary": "off"
+        // "no-param-reassign": "off",
+        // "radix": "off",
+        // "no-nested-ternary": "off"
     },
 
     "root": true,

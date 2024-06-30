@@ -1,21 +1,25 @@
 class Gameboard {
   constructor() {
     /* eslint-disable-next-line no-unused-vars */
-    this.board = new Array(10).fill(null).map((row) => new Array(10).fill(null));
+    this.board = new Array(10).fill(null).map(() => new Array(10).fill(null));
     this.missedAttack = [];
     this.attackedCoords = [];
     this.allAttackCoords = [];
   }
 
   isValidCoords(ship, x, y) {
-    if (isNaN(x) || isNaN(y)) return false;
+    for (let i = 0; i < ship.length; i += 1) {
+      if (
+        !ship.vertical &&
+        (y + i >= this.board.length || this.board[x][y + i] !== null)
+      )
+        return false;
 
-    for (let i = 0; i < ship.length; i++) {
-      if (!ship.vertical && (y + i >= this.board.length
-        || this.board[x][y + i] !== null)) return false;
-
-      if (ship.vertical && (x + i >= this.board.length
-        || this.board[x + i][y] !== null)) return false;
+      if (
+        ship.vertical &&
+        (x + i >= this.board.length || this.board[x + i][y] !== null)
+      )
+        return false;
     }
     return true;
   }
@@ -23,7 +27,7 @@ class Gameboard {
   placeShip(ship, x, y) {
     const isValid = this.isValidCoords(ship, x, y);
     if (isValid) {
-      for (let i = 0; i < ship.length; i++) {
+      for (let i = 0; i < ship.length; i += 1) {
         if (!ship.vertical) {
           this.board[x][y + i] = ship;
         } else {
@@ -58,7 +62,7 @@ class Gameboard {
     return true;
   }
 
-  allShipSunk(shipArray) {
+  static allShipSunk(shipArray) {
     return shipArray.every((ship) => ship.isSunk());
   }
 }

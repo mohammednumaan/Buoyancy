@@ -1,103 +1,40 @@
-const domHelper = require("./domInterface");
+const domInterface = require("./domInterface");
 
 class ShipDOM {
   static #generatedCoords = [];
 
-  static #highlightShips(event, homePlayer, currentShip, forPlacement = false) {
-    const [xCoord, yCoord] = domHelper.parseCoords(
-      event.target.dataset.x,
-      event.target.dataset.y,
-    );
-    const isValid = homePlayer.gameBoard.isValidCoords(
-      currentShip,
-      xCoord,
-      yCoord,
-    );
+  //
+  static async placeShips(homePlayer, homeDomBoard) {
+    const dashboardContainer = document.querySelector(".dashboard-container");
+    let isAllPlaced = false;
 
+    domInterface.createShipContainers(homePlayer)
+    while (!isAllPlaced) {
+      try {
+        await ShipDOM.#delegateShipDrop(
+          homePlayer,
+          homeDomBoard,
+        );
+        isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    return Promise.resolve();
+  }
+
+  static #markPlacedShip(domBoardClass, currentShip, x, y, isAi = false) {
     for (let i = 0; i < currentShip.length; i += 1) {
       const cell = !currentShip.vertical
-        ? domHelper.getCellElement(
-            xCoord,
-            yCoord + i,
-            event.currentTarget.className,
-          )
-        : domHelper.getCellElement(
-            xCoord + i,
-            yCoord,
-            event.currentTarget.className,
-          );
+        ? domInterface.getCellElement(x, y + i, domBoardClass)
+        : domInterface.getCellElement(x + i, y, domBoardClass);
 
       if (!cell) return;
 
-      cell.classList.add(isValid ? "valid" : "invalid");
-      if (forPlacement) cell.classList.add("placed-ship");
+      cell.classList.add("placed-ship");
+      if (isAi) cell.style.backgroundColor = "black";
     }
-  }
-
-  static #clearHighlightShips() {
-    const highlightedElements = document.querySelectorAll(".valid, .invalid");
-    highlightedElements.forEach((element) =>
-      element.classList.remove("valid", "invalid"),
-    );
-  }
-
-  static #delegateShipPlacement(homeDomBoard, homePlayer, currentShip) {
-    return new Promise((resolve, reject) => {
-      const handleClick = (e) => {
-        const [xCoord, yCoord] = domHelper.parseCoords(
-          e.target.dataset.x,
-          e.target.dataset.y,
-        );
-
-        if (!e.target.classList.contains("board-cell")) {
-          return reject(currentShip);
-        }
-
-        if (homePlayer.gameBoard.isValidCoords(currentShip, xCoord, yCoord)) {
-          homePlayer.gameBoard.placeShip(currentShip, xCoord, yCoord);
-          console.log(homeDomBoard.className);
-          ShipDOM.#markPlacedShip(
-            homeDomBoard.className,
-            currentShip,
-            xCoord,
-            yCoord,
-          );
-
-          resolve(currentShip);
-        }
-
-        return reject(currentShip);
-      };
-
-      homeDomBoard.addEventListener("click", handleClick, { once: true });
-    });
-  }
-
-  static async placeShips(currentShip, player, playerBoardContainer) {
-    const abortController = new AbortController();
-    const { signal } = abortController;
-
-    const highlightShips = (e) =>
-      ShipDOM.#highlightShips(e, player, currentShip);
-    const clearHighlight = () => ShipDOM.#clearHighlightShips(player.gameBoard);
-
-    playerBoardContainer.addEventListener("mouseover", highlightShips, {
-      signal,
-    });
-    playerBoardContainer.addEventListener("mouseout", clearHighlight, {
-      signal,
-    });
-
-    try {
-      await ShipDOM.#delegateShipPlacement(
-        playerBoardContainer,
-        player,
-        currentShip,
-      );
-    } catch (err) {
-      await ShipDOM.placeShips(currentShip, player, playerBoardContainer);
-    }
-    abortController.abort();
   }
 
   static #attackedShipClass(cell) {
@@ -108,23 +45,11 @@ class ShipDOM {
     );
   }
 
-  static #markPlacedShip(domBoardClass, currentShip, x, y, isAi = false) {
-    for (let i = 0; i < currentShip.length; i += 1) {
-      const cell = !currentShip.vertical
-        ? domHelper.getCellElement(x, y + i, domBoardClass)
-        : domHelper.getCellElement(x + i, y, domBoardClass);
-
-      if (!cell) return;
-
-      cell.classList.add("placed-ship");
-      if (isAi) cell.style.backgroundColor = "black";
-    }
-  }
-
+  // delegates the click event from the gameboard to the appropriate cell
   static #delegateShipAttack(enemyDomBoard, enemyPlayer) {
     return new Promise((resolve, reject) => {
       const handleClick = (e) => {
-        const [xCoord, yCoord] = domHelper.parseCoords(
+        const [xCoord, yCoord] = domInterface.parseCoords(
           e.target.dataset.x,
           e.target.dataset.y,
         );
@@ -132,7 +57,6 @@ class ShipDOM {
         if (!e.target.classList.contains("board-cell")) {
           return reject(e);
         }
-
         if (enemyPlayer.gameBoard.recieveAttack(xCoord, yCoord)) {
           ShipDOM.#attackedShipClass(e.target);
           resolve(e);
@@ -140,10 +64,14 @@ class ShipDOM {
 
         return reject(e);
       };
+
+      // attach click event listener that listens to the event only once
+      // to avoid unintentional behaviour (such as registering an attack when its **not** the player's turn)
       enemyDomBoard.addEventListener("click", handleClick, { once: true });
     });
   }
 
+  //
   static async attackShip(enemyDomBoard, enemyPlayer) {
     try {
       await ShipDOM.#delegateShipAttack(enemyDomBoard, enemyPlayer);
@@ -152,17 +80,24 @@ class ShipDOM {
     }
   }
 
+  // a simple method that generates unique and random [x, y] tuples
+  // for the AI to attack and place ships on its board
   static #generateRandomCoords() {
     const coordsArr = [
       Math.floor(Math.random() * 10),
       Math.floor(Math.random() * 10),
     ];
+
+    // if the generatedCoords array includes the newly created [x, y] tuple,
+    // run this function recursively until it finds a unique one
     !ShipDOM.#generatedCoords.includes(coordsArr)
       ? ShipDOM.#generatedCoords.push(coordsArr)
       : ShipDOM.#generateRandomCoords();
     return coordsArr;
   }
 
+  // delegate AI's ship placement on its board by randomly generating
+  // [x, y] tuples to place a ship
   static #delgateAIPlacement(currShip, enemyPlayer) {
     const [x, y] = ShipDOM.#generateRandomCoords();
 
@@ -173,116 +108,71 @@ class ShipDOM {
     ShipDOM.#markPlacedShip("player-two-board", currShip, x, y, true);
   }
 
+  // a simple method that places all AI's ships
   static placeAIShips(enemyPlayer) {
     enemyPlayer.allShips.forEach((ship) =>
       ShipDOM.#delgateAIPlacement(ship, enemyPlayer),
     );
   }
 
+  // a simple method that attacks the enemy player's (homePlayer)
+  // board by generating random [x, y] tuples
   static attackShipAI(enemyPlayer, enemyDomBoard) {
     const [x, y] = ShipDOM.#generateRandomCoords();
     if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
-      const cell = domHelper.getCellElement(x, y, enemyDomBoard.className);
+      const cell = domInterface.getCellElement(x, y, enemyDomBoard.className);
       ShipDOM.#attackedShipClass(cell);
     } else {
       ShipDOM.attackShipAI(enemyPlayer, enemyDomBoard);
     }
   }
 
-  static async placeShipsDrop(homePlayer, homeDomBoard) {
-    domHelper.createShipContainers(homePlayer);
-    let isAllPlaced = false;
-    const dashboard = document.querySelector(".dashboard-container");
-
-    while (!isAllPlaced) {
-      try {
-        await ShipDOM.#delegateShipDrop(homePlayer, homeDomBoard);
-        isAllPlaced = !Array.from(dashboard.children).slice(1).length;
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    return Promise.resolve();
-  }
-
   static async #delegateShipDrop(homePlayer, homeDomBoard) {
+    const abortController = new AbortController();
     return new Promise((resolve, reject) => {
       const dropHandler = (e) => {
         e.preventDefault();
-        const data = e.dataTransfer.getData("application/my-app");
-
-        const shipContainer = document.getElementById(data);
-        const shipCell = [...shipContainer.children];
-
+        const index = e.dataTransfer.getData("application/index");
+        
+        const shipContainer = document.querySelector(`[data-index="${index}"]`);
+        const shipCells = [...shipContainer.children];
+        
         if (!e.target.classList.contains("board-cell")) return;
-        const [x, y] = domHelper.getCellCoords(e.target);
+        const [x, y] = domInterface.getCellCoords(e.target);
+        
+        const currentShip = homePlayer.allShips[Number(index)];
+        
+        if (!homePlayer.gameBoard.isValidCoords(currentShip, x, y)) return;
 
-        const obj = {
-          length: data === "33" ? 3 : Number(data),
-          vertical: false,
-        };
-        if (!homePlayer.gameBoard.isValidCoords(obj, x, y)) return;
-
-        for (let j = 0; j < Number(data === "33" ? "3" : data); j++) {
-          const cell = domHelper.getCellElement(
-            x,
-            y + j,
-            e.currentTarget.className,
-          );
-          shipCell[j].dataset.x = x;
-          shipCell[j].dataset.y = y + j;
-          cell.replaceWith(shipCell[j]);
+        for (let i = 0; i < currentShip.length; i++) {
+          const cell = !currentShip.vertical
+            ? domInterface.getCellElement(x, y + i, homeDomBoard.className)
+            : domInterface.getCellElement(x + i, y, homeDomBoard.className);
+          shipCells[i].dataset.x = !currentShip.vertical ? x : x + i;
+          shipCells[i].dataset.y = !currentShip.vertical ? y + i : y;
+          cell.replaceWith(shipCells[i]);
         }
-        shipContainer.remove();
+
         homePlayer.gameBoard.placeShip(
-          homePlayer.allShips[Number(shipContainer.dataset.index)],
+          currentShip,
           x,
           y,
         );
-        ShipDOM.#markPlacedShip(homeDomBoard.className, obj, x, y);
-        homeDomBoard.removeEventListener("dragover", ShipDOM.#dragoverHandler);
-        homeDomBoard.removeEventListener("drop", dropHandler);
-
-        return resolve(e);
+        shipContainer.remove();
+        ShipDOM.#markPlacedShip(homeDomBoard.className, currentShip, x, y);
+        document.body.addEventListener('keydown', () => console.log(e))
+        abortController.abort();  
+        resolve(e);
       };
-      homeDomBoard.addEventListener("dragover", ShipDOM.#dragoverHandler);
-      homeDomBoard.addEventListener("drop", dropHandler);
+      homeDomBoard.addEventListener("dragover", domInterface.dragoverHandler, {
+        signal: abortController.signal,
+      });
+      homeDomBoard.addEventListener("drop", dropHandler, {
+        signal: abortController.signal,
+      });
+
     });
   }
-
-  static #dragoverHandler(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  }
-
-  // static #dropHandler(e, homePlayer) {
-  //   e.preventDefault();
-  //   let data = e.dataTransfer.getData("application/my-app");
-  //   let index = e.dataTransfer.getData("application/index");
-  //   const shipCell = [...document.getElementById(data).children];
-  //   const shipContainer = document.getElementById(data);
-
-  //   if (!e.target.classList.contains("board-cell")) return;
-  //   const [x, y] = domHelper.getCellCoords(e.target);
-
-  //   const obj = { length: data === "33" ? 3 : Number(data), vertical: false };
-  //   if (!homePlayer.gameBoard.isValidCoords(obj, x, y)) return;
-
-  //   for (let j = 0; j < Number(data === "33" ? "3" : data); j++) {
-  //     const cell = domHelper.getCellElement(
-  //       x,
-  //       y + j,
-  //       e.currentTarget.className,
-  //     );
-  //     shipCell[j].dataset.x = x;
-  //     shipCell[j].dataset.y = y + j;
-  //     cell.replaceWith(shipCell[j]);
-
-  //   }
-  //   shipContainer.remove()
-  //   homePlayer.gameBoard.placeShip(homePlayer.allShips[Number(index)], x, y);
-  // }
 }
 
 module.exports = ShipDOM;

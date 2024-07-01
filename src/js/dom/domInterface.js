@@ -1,4 +1,4 @@
-class domHelper {
+class domInterface {
   static playerOneDiv = document.querySelector(".player-one");
 
   static playerTwoDiv = document.querySelector(".player-two");
@@ -10,6 +10,9 @@ class domHelper {
   static playerTwoTitle = document.createElement("h4");
 
   /* eslint-disable no-param-reassign */
+
+  // a simple loop to create a 10x10 grid for
+  // players to place and attack ships
   static createBoards(playerBoard) {
     playerBoard.style.gridTemplateColumns = "repeat(10, 1fr)";
     playerBoard.style.gridTemplateRows = "repeat(10, 1fr)";
@@ -25,15 +28,22 @@ class domHelper {
     }
   }
 
+  // creates ship containers for players to
+  // drag and drop ships onto their board
   static createShipContainers(homePlayer) {
-    const dashboard = document.querySelector(".dashboard-container");
+    const dashboardContainer = document.querySelector(".dashboard-container");
+    const dashboard = document.querySelector(".dashboard");
     dashboard.style.display = "flex";
+    dashboardContainer.style.display = "flex"
 
     for (let i = 0; i < homePlayer.allShips.length; i += 1) {
       const shipContainer = document.createElement("div");
       shipContainer.className = "ship-container";
       shipContainer.draggable = true;
-      shipContainer.id = i === 2 ? 33 : homePlayer.allShips[i].length;
+
+      // set a data-* attribute to identify this container
+      // based on the ship's index, which is later used to
+      // retrieve and place the ship on the board via drag and drop
       shipContainer.dataset.index = i;
 
       for (let j = 0; j < homePlayer.allShips[i].length; j += 1) {
@@ -43,41 +53,47 @@ class domHelper {
         shipCell.style.backgroundColor = "#957eff";
         shipContainer.appendChild(shipCell);
       }
-      shipContainer.addEventListener("dragstart", domHelper.#dragStartHandler);
-      dashboard.appendChild(shipContainer);
+      shipContainer.addEventListener(
+        "dragstart",
+        domInterface.dragStartHandler,
+      );
+      dashboardContainer.appendChild(shipContainer);
     }
+    
   }
 
+  // render board cells and board view according to the
+  // current player's turn (this func is  called when played against a human)
   static renderBoards(homeDomBoard, enemyDomBoard) {
-    [domHelper.playerOneDiv, domHelper.playerTwoDiv].forEach((div) =>
+
+    // remove the existing board state by removing all its children
+    [domInterface.playerOneDiv, domInterface.playerTwoDiv].forEach((div) =>
       div.replaceChildren(),
     );
-    domHelper.playerOneTitle.textContent = "Your Gameboard";
-    domHelper.playerTwoTitle.textContent = "Opponent's Gameboard";
 
-    domHelper.playerOneDiv.replaceChildren(homeDomBoard);
-    domHelper.playerOneDiv.prepend(domHelper.playerOneTitle);
+    domInterface.playerOneTitle.textContent = "Your Gameboard";
+    domInterface.playerTwoTitle.textContent = "Opponent's Gameboard";
 
-    domHelper.playerTwoDiv.replaceChildren(enemyDomBoard);
-    domHelper.playerTwoDiv.prepend(domHelper.playerTwoTitle);
+    // simple logic to switch the board and its board cells 
+    // based on the current player's turn. 
 
-    domHelper.updateBoardCells(
+    // by replacing player-2's board on the left and player-1's
+    // board on the right (based on the player's turn)
+    domInterface.playerOneDiv.replaceChildren(homeDomBoard);
+    domInterface.playerOneDiv.prepend(domInterface.playerOneTitle);
+
+    domInterface.playerTwoDiv.replaceChildren(enemyDomBoard);
+    domInterface.playerTwoDiv.prepend(domInterface.playerTwoTitle);
+
+    // update each cell by the current player's turn and each cell's state
+    domInterface.updateBoardCells(
       homeDomBoard.childNodes,
       enemyDomBoard.childNodes,
     );
   }
 
+  // renders appropriate classes for each cell based on their state
   static updateBoardCells(homeDomBoard, enemyDomBoard) {
-    enemyDomBoard.forEach((cell) => {
-      cell.style.backgroundColor = cell.classList.contains("attacked-ship")
-        ? "#aa2c55"
-        : cell.classList.contains("missed-attack")
-          ? "#181f4e"
-          : cell.classList.contains("placed-ship")
-            ? "black"
-            : "black";
-    });
-
     homeDomBoard.forEach((cell) => {
       cell.style.backgroundColor = cell.classList.contains("attacked-ship")
         ? "#aa2c55"
@@ -87,22 +103,35 @@ class domHelper {
             ? "#957eff"
             : "black";
     });
+
+    enemyDomBoard.forEach((cell) => {
+      cell.style.backgroundColor = cell.classList.contains("attacked-ship")
+        ? "#aa2c55"
+        : cell.classList.contains("missed-attack")
+          ? "#181f4e"
+          : cell.classList.contains("placed-ship")
+            ? "black"
+            : "black";
+    });
   }
 
-  static createTimeoutScreen() {
+  // renders a timeout screen and blurs the background
+  // to avoid visibility of current player's gameboard
+  // (the func is called when played against a human)
+  static createTimeoutScreen(text) {
     let count = 4;
     const timeoutScreen = document.querySelector(".timeout-screen");
 
     return new Promise((resolve) => {
       setTimeout(() => {
         timeoutScreen.style.display = "flex";
-        domHelper.continueBtn.display = "flex";
+        domInterface.continueBtn.display = "flex";
       }, 1000);
-      timeoutScreen.textContent = `Hand it over: ${count}!`;
+      timeoutScreen.textContent = `${text}: ${count}!`;
 
       const timer = setInterval(() => {
         count -= 1;
-        timeoutScreen.textContent = `Hand it over: ${count}!`;
+        timeoutScreen.textContent = `${text}: ${count}!`;
 
         if (count === 0) {
           clearInterval(timer);
@@ -113,25 +142,34 @@ class domHelper {
     });
   }
 
+  // retrieve the cell element with the x and y coord from the player's board
   static getCellElement(x, y, boardClassName) {
     return document.querySelector(
       `.${boardClassName} > [data-x="${x}"][data-y="${y}"]`,
     );
   }
 
+  // retrieve the x and y coords from the cell element
   static getCellCoords(cell) {
-    return domHelper.parseCoords(cell.dataset.x, cell.dataset.y);
+    return domInterface.parseCoords(cell.dataset.x, cell.dataset.y);
   }
 
+  // parses the coord dataset string to an integer
   static parseCoords(x, y) {
     return [parseInt(x, 10), parseInt(y, 10)];
   }
 
-  static #dragStartHandler(e) {
-    e.dataTransfer.setData("application/my-app", e.target.id);
+  // an event handler to handle dragstart event
+  static dragStartHandler(e) {
     e.dataTransfer.setData("application/index", e.target.dataset.index);
     e.dataTransfer.effectAllowed = "move";
   }
+
+  // an event handler to handle dragover event
+  static dragoverHandler(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }
 }
 
-module.exports = domHelper;
+module.exports = domInterface;

@@ -30,7 +30,7 @@ export default function starterDOM() {
   modesContainer.className = "game-mode-buttons";
 
   h1El.textContent = "A Strategic Naval Warfare Game.";
-  aiBtn.textContent = "Play with AI";
+  aiBtn.textContent = "Play with AI ";
   humanBtn.textContent = "Play with Human";
 
   Array.from([aiBtn, humanBtn]).forEach((btn) =>

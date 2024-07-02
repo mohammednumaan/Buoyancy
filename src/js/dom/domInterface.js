@@ -1,26 +1,26 @@
 class domInterface {
-  static playerOneDiv = document.querySelector(".player-one");
+  static playerOneDiv = document.querySelector('.player-one');
 
-  static playerTwoDiv = document.querySelector(".player-two");
+  static playerTwoDiv = document.querySelector('.player-two');
 
-  static continueBtn = document.querySelector(".timeout-screen > button");
+  static continueBtn = document.querySelector('.timeout-screen > button');
 
-  static playerOneTitle = document.createElement("h4");
+  static playerOneTitle = document.createElement('h4');
 
-  static playerTwoTitle = document.createElement("h4");
+  static playerTwoTitle = document.createElement('h4');
 
   /* eslint-disable no-param-reassign */
 
   // a simple loop to create a 10x10 grid for
   // players to place and attack ships
   static createBoards(playerBoard) {
-    playerBoard.style.gridTemplateColumns = "repeat(10, 1fr)";
-    playerBoard.style.gridTemplateRows = "repeat(10, 1fr)";
+    playerBoard.style.gridTemplateColumns = 'repeat(10, 1fr)';
+    playerBoard.style.gridTemplateRows = 'repeat(10, 1fr)';
 
     for (let i = 0; i < 10; i += 1) {
       for (let j = 0; j < 10; j += 1) {
-        const cell = document.createElement("div");
-        cell.className = "board-cell";
+        const cell = document.createElement('div');
+        cell.className = 'board-cell';
         cell.dataset.x = i;
         cell.dataset.y = j;
         playerBoard.appendChild(cell);
@@ -31,14 +31,14 @@ class domInterface {
   // creates ship containers for players to
   // drag and drop ships onto their board
   static createShipContainers(homePlayer) {
-    const dashboardContainer = document.querySelector(".dashboard-container");
-    const dashboard = document.querySelector(".dashboard");
-    dashboard.style.display = "flex";
-    dashboardContainer.style.display = "flex"
+    const dashboardContainer = document.querySelector('.dashboard-container');
+    const dashboard = document.querySelector('.dashboard');
+    dashboard.style.display = 'flex';
+    dashboardContainer.style.display = 'flex';
 
     for (let i = 0; i < homePlayer.allShips.length; i += 1) {
-      const shipContainer = document.createElement("div");
-      shipContainer.className = "ship-container";
+      const shipContainer = document.createElement('div');
+      shipContainer.className = 'ship-container';
       shipContainer.draggable = true;
 
       // set a data-* attribute to identify this container
@@ -47,35 +47,32 @@ class domInterface {
       shipContainer.dataset.index = i;
 
       for (let j = 0; j < homePlayer.allShips[i].length; j += 1) {
-        console.log("hi");
-        const shipCell = document.createElement("div");
-        shipCell.className = "board-cell";
-        shipCell.style.backgroundColor = "#957eff";
+        const shipCell = document.createElement('div');
+        shipCell.className = 'board-cell';
+        shipCell.classList.add('ship-cell');
         shipContainer.appendChild(shipCell);
       }
       shipContainer.addEventListener(
-        "dragstart",
+        'dragstart',
         domInterface.dragStartHandler,
       );
       dashboardContainer.appendChild(shipContainer);
     }
-    
   }
 
   // render board cells and board view according to the
   // current player's turn (this func is  called when played against a human)
   static renderBoards(homeDomBoard, enemyDomBoard) {
-
     // remove the existing board state by removing all its children
-    [domInterface.playerOneDiv, domInterface.playerTwoDiv].forEach((div) =>
-      div.replaceChildren(),
-    );
+    [domInterface.playerOneDiv, domInterface.playerTwoDiv].forEach((div) => div.replaceChildren());
 
-    domInterface.playerOneTitle.textContent = "Your Gameboard";
+    domInterface.playerOneTitle.textContent = homeDomBoard.className === '.player-one-board'
+      ? "Player One's Board"
+      : "Player Two's Board";
     domInterface.playerTwoTitle.textContent = "Opponent's Gameboard";
 
-    // simple logic to switch the board and its board cells 
-    // based on the current player's turn. 
+    // simple logic to switch the board and its board cells
+    // based on the current player's turn.
 
     // by replacing player-2's board on the left and player-1's
     // board on the right (based on the player's turn)
@@ -95,23 +92,23 @@ class domInterface {
   // renders appropriate classes for each cell based on their state
   static updateBoardCells(homeDomBoard, enemyDomBoard) {
     homeDomBoard.forEach((cell) => {
-      cell.style.backgroundColor = cell.classList.contains("attacked-ship")
-        ? "#aa2c55"
-        : cell.classList.contains("missed-attack")
-          ? "#181f4e"
-          : cell.classList.contains("placed-ship")
-            ? "#957eff"
-            : "black";
+      cell.style.backgroundColor = cell.classList.contains('attacked-ship')
+        ? '#aa2c55'
+        : cell.classList.contains('missed-attack')
+          ? '#181f4e'
+          : cell.classList.contains('placed-ship')
+            ? '#957eff'
+            : 'black';
     });
 
     enemyDomBoard.forEach((cell) => {
-      cell.style.backgroundColor = cell.classList.contains("attacked-ship")
-        ? "#aa2c55"
-        : cell.classList.contains("missed-attack")
-          ? "#181f4e"
-          : cell.classList.contains("placed-ship")
-            ? "black"
-            : "black";
+      cell.style.backgroundColor = cell.classList.contains('attacked-ship')
+        ? '#aa2c55'
+        : cell.classList.contains('missed-attack')
+          ? '#181f4e'
+          : cell.classList.contains('placed-ship')
+            ? 'black'
+            : 'black';
     });
   }
 
@@ -120,12 +117,12 @@ class domInterface {
   // (the func is called when played against a human)
   static createTimeoutScreen(text) {
     let count = 4;
-    const timeoutScreen = document.querySelector(".timeout-screen");
+    const timeoutScreen = document.querySelector('.timeout-screen');
 
     return new Promise((resolve) => {
       setTimeout(() => {
-        timeoutScreen.style.display = "flex";
-        domInterface.continueBtn.display = "flex";
+        timeoutScreen.style.display = 'flex';
+        domInterface.continueBtn.display = 'flex';
       }, 1000);
       timeoutScreen.textContent = `${text}: ${count}!`;
 
@@ -135,7 +132,7 @@ class domInterface {
 
         if (count === 0) {
           clearInterval(timer);
-          timeoutScreen.style.display = "none";
+          timeoutScreen.style.display = 'none';
           resolve();
         }
       }, 1000);
@@ -161,14 +158,14 @@ class domInterface {
 
   // an event handler to handle dragstart event
   static dragStartHandler(e) {
-    e.dataTransfer.setData("application/index", e.target.dataset.index);
-    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData('application/index', e.target.dataset.index);
+    e.dataTransfer.effectAllowed = 'move';
   }
 
   // an event handler to handle dragover event
   static dragoverHandler(e) {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.dropEffect = 'move';
   }
 }
 

@@ -1,20 +1,21 @@
-const domInterface = require("./domInterface");
+const { resetPlacement } = require('../gameLogic');
+const domInterface = require('./domInterface');
 
 class ShipDOM {
   static #generatedCoords = [];
 
-  //
+  // an async function that controls the flow of ship plcaement
   static async placeShips(homePlayer, homeDomBoard) {
-    const dashboardContainer = document.querySelector(".dashboard-container");
-    let isAllPlaced = false;
+    const dashboardContainer = document.querySelector('.dashboard-container');
+    const resetBtn = document.getElementById('reset-btn');
 
-    domInterface.createShipContainers(homePlayer)
+    let isAllPlaced = false;
+    resetBtn.onclick = () => resetPlacement(homePlayer, homeDomBoard);
+    domInterface.createShipContainers(homePlayer);
+
     while (!isAllPlaced) {
       try {
-        await ShipDOM.#delegateShipDrop(
-          homePlayer,
-          homeDomBoard,
-        );
+        await ShipDOM.#delegateShipDrop(homePlayer, homeDomBoard);
         isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
       } catch (err) {
         console.log(err);
@@ -32,16 +33,16 @@ class ShipDOM {
 
       if (!cell) return;
 
-      cell.classList.add("placed-ship");
-      if (isAi) cell.style.backgroundColor = "black";
+      cell.classList.add('placed-ship');
+      if (isAi) cell.style.backgroundColor = 'black';
     }
   }
 
   static #attackedShipClass(cell) {
     cell.classList.add(
-      cell.classList.contains("placed-ship")
-        ? "attacked-ship"
-        : "missed-attack",
+      cell.classList.contains('placed-ship')
+        ? 'attacked-ship'
+        : 'missed-attack',
     );
   }
 
@@ -54,7 +55,7 @@ class ShipDOM {
           e.target.dataset.y,
         );
 
-        if (!e.target.classList.contains("board-cell")) {
+        if (!e.target.classList.contains('board-cell')) {
           return reject(e);
         }
         if (enemyPlayer.gameBoard.recieveAttack(xCoord, yCoord)) {
@@ -66,8 +67,9 @@ class ShipDOM {
       };
 
       // attach click event listener that listens to the event only once
-      // to avoid unintentional behaviour (such as registering an attack when its **not** the player's turn)
-      enemyDomBoard.addEventListener("click", handleClick, { once: true });
+      // to avoid unintentional behaviour such as registering an attack
+      // when its **not** the player's turn)
+      enemyDomBoard.addEventListener('click', handleClick, { once: true });
     });
   }
 
@@ -96,6 +98,7 @@ class ShipDOM {
     return coordsArr;
   }
 
+  /* eslint-disable consistent-return */
   // delegate AI's ship placement on its board by randomly generating
   // [x, y] tuples to place a ship
   static #delgateAIPlacement(currShip, enemyPlayer) {
@@ -105,14 +108,12 @@ class ShipDOM {
       return ShipDOM.#delgateAIPlacement(currShip, enemyPlayer);
     }
     enemyPlayer.gameBoard.placeShip(currShip, x, y);
-    ShipDOM.#markPlacedShip("player-two-board", currShip, x, y, true);
+    ShipDOM.#markPlacedShip('player-two-board', currShip, x, y, true);
   }
 
   // a simple method that places all AI's ships
   static placeAIShips(enemyPlayer) {
-    enemyPlayer.allShips.forEach((ship) =>
-      ShipDOM.#delgateAIPlacement(ship, enemyPlayer),
-    );
+    enemyPlayer.allShips.forEach((ship) => ShipDOM.#delgateAIPlacement(ship, enemyPlayer));
   }
 
   // a simple method that attacks the enemy player's (homePlayer)
@@ -128,49 +129,58 @@ class ShipDOM {
   }
 
   static async #delegateShipDrop(homePlayer, homeDomBoard) {
+    // create an abort controller to handle removal of event listeners
     const abortController = new AbortController();
-    return new Promise((resolve, reject) => {
+
+    return new Promise((resolve) => {
       const dropHandler = (e) => {
         e.preventDefault();
-        const index = e.dataTransfer.getData("application/index");
-        
+
+        // retrieve the dragged element's index
+        const index = e.dataTransfer.getData('application/index');
+
+        // retrieve the corresponding shipContainer based on the retrieved index
         const shipContainer = document.querySelector(`[data-index="${index}"]`);
         const shipCells = [...shipContainer.children];
-        
-        if (!e.target.classList.contains("board-cell")) return;
+
+        if (!e.target.classList.contains('board-cell')) return;
+
         const [x, y] = domInterface.getCellCoords(e.target);
-        
         const currentShip = homePlayer.allShips[Number(index)];
-        
+
         if (!homePlayer.gameBoard.isValidCoords(currentShip, x, y)) return;
 
-        for (let i = 0; i < currentShip.length; i++) {
+        // if the selected drop coords is valid, begin placing the ship
+        for (let i = 0; i < currentShip.length; i += 1) {
+          // retrieve the cell element from the board based on the ship's direction
           const cell = !currentShip.vertical
             ? domInterface.getCellElement(x, y + i, homeDomBoard.className)
             : domInterface.getCellElement(x + i, y, homeDomBoard.className);
+
+          // retrieve the shipCell from the shipContainer and assign it [x, y] dataset coords
           shipCells[i].dataset.x = !currentShip.vertical ? x : x + i;
           shipCells[i].dataset.y = !currentShip.vertical ? y + i : y;
+          shipCells[i].classList.remove('ship-cell');
+
+          // replace the homeDomBoard's cell with [x, y] coord with the retrieved shipCell
           cell.replaceWith(shipCells[i]);
         }
 
-        homePlayer.gameBoard.placeShip(
-          currentShip,
-          x,
-          y,
-        );
+        homePlayer.gameBoard.placeShip(currentShip, x, y);
+
+        // remove the shipContainer from the dashboard as an indication of it being placed
         shipContainer.remove();
         ShipDOM.#markPlacedShip(homeDomBoard.className, currentShip, x, y);
-        document.body.addEventListener('keydown', () => console.log(e))
-        abortController.abort();  
+
+        abortController.abort();
         resolve(e);
       };
-      homeDomBoard.addEventListener("dragover", domInterface.dragoverHandler, {
+      homeDomBoard.addEventListener('dragover', domInterface.dragoverHandler, {
         signal: abortController.signal,
       });
-      homeDomBoard.addEventListener("drop", dropHandler, {
+      homeDomBoard.addEventListener('drop', dropHandler, {
         signal: abortController.signal,
       });
-
     });
   }
 }

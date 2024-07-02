@@ -58,14 +58,24 @@ body{
     border: 1px solid black;
 } */
 
+.dashboard-options{
+    display: flex;
+    gap: 10px;
+}
+
 .ship-container{
     display: flex;
     width: fit-content;
 }
 
-#direction-btn{
+.ship-cell{
+    background-color: #957eff;
+}
+
+#direction-btn,
+#reset-btn{
     text-align: center;
-    width: 33vh;
+    width: 16vh;
     height: 26px;
 
     border: 1px solid var(--color);
@@ -111,15 +121,6 @@ body{
     height: 48px;
     border: 1px solid var(--color);
 }
-
-.valid{
-    background-color: #d6d1ff;
-}
-
-.invalid{
-    background-color: red;
-}
-
 
 .placed-ship{
     background-color: var(--place);
@@ -195,4 +196,22 @@ body{
 .game-mode-buttons{
     display: flex;
     gap: 20px;
+}
+
+.game-over-modal{
+    display: none;
+    justify-content: center;
+    align-items: center;
+    color: var(--color);
+
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    top: 0;
+    left: 0;
+
+    backdrop-filter: blur(100px);
+    animation: fadeInAnimation ease-in 7s;
+    animation-iteration-count: 1;
 }

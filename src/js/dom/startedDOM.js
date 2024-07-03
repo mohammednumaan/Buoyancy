@@ -38,8 +38,8 @@ export default function starterDOM() {
   aiBtn.textContent = 'Play with AI ';
   humanBtn.textContent = 'Play with Human';
 
-  Array.from([aiBtn, humanBtn]).forEach((btn) => modesContainer.appendChild(btn));
-  Array.from([h1El, modesContainer]).forEach((el) => starterDivContainer.appendChild(el));
+  [h1El, modesContainer].forEach((el) => starterDivContainer.appendChild(el));
+  [aiBtn, humanBtn].forEach((btn) => modesContainer.appendChild(btn))
   attachListeners(aiBtn, humanBtn);
 
   starterDiv.appendChild(starterDivContainer);

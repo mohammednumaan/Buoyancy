@@ -1,3 +1,5 @@
+const { changeDomShipDirection } = require("../gameLogic");
+
 class domInterface {
   static playerOneDiv = document.querySelector('.player-one');
 
@@ -32,6 +34,7 @@ class domInterface {
   // drag and drop ships onto their board
   static createShipContainers(homePlayer) {
     const dashboardContainer = document.querySelector('.dashboard-container');
+    const changeDirectionBtn = document.getElementById('direction-btn')
     const dashboard = document.querySelector('.dashboard');
     dashboard.style.display = 'flex';
     dashboardContainer.style.display = 'flex';
@@ -56,6 +59,8 @@ class domInterface {
         'dragstart',
         domInterface.dragStartHandler,
       );
+
+      shipContainer.onclick = (e) => changeDomShipDirection(homePlayer.allShips[i], e.currentTarget)
       dashboardContainer.appendChild(shipContainer);
     }
   }

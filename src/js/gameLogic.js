@@ -93,6 +93,12 @@ export function resetPlacement(homePlayer, homeDomBoard) {
   homePlayer.gameBoard = new Gameboard();
 }
 
+export function changeDomShipDirection(currentShip, shipContainer){
+
+  shipContainer.style['flex-direction'] = currentShip.vertical ? 'row' : 'column'  
+  currentShip.changeDirection();  
+}
+
 function openGameOverModal(winner){
   const modal = document.createElement('div')
   const modalContainer = document.createElement('div')

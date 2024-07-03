@@ -103,12 +103,16 @@ class ShipDOM {
   // [x, y] tuples to place a ship
   static #delgateAIPlacement(currShip, enemyPlayer) {
     const [x, y] = ShipDOM.#generateRandomCoords();
-
+    const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
+    
+    if (directionChoice) currShip.changeDirection();
+    
     if (!enemyPlayer.gameBoard.isValidCoords(currShip, x, y)) {
       return ShipDOM.#delgateAIPlacement(currShip, enemyPlayer);
     }
     enemyPlayer.gameBoard.placeShip(currShip, x, y);
     ShipDOM.#markPlacedShip('player-two-board', currShip, x, y, true);
+    console.log(enemyPlayer.gameBoard.board)
   }
 
   // a simple method that places all AI's ships

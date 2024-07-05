@@ -25,6 +25,7 @@ export default function starterDOM() {
   const starterDiv = document.createElement('div');
   const starterDivContainer = document.createElement('div');
   const modesContainer = document.createElement('div');
+  const footer = document.querySelector('.footer')
 
   const h1El = document.createElement('h1');
   const aiBtn = document.createElement('button');
@@ -35,14 +36,14 @@ export default function starterDOM() {
   modesContainer.className = 'game-mode-buttons';
 
   h1El.textContent = 'A Strategic Naval Warfare Game.';
-  aiBtn.textContent = 'Play with AI ';
+  aiBtn.textContent = 'Play with AI';
   humanBtn.textContent = 'Play with Human';
 
   [h1El, modesContainer].forEach((el) => starterDivContainer.appendChild(el));
-  [aiBtn, humanBtn].forEach((btn) => modesContainer.appendChild(btn))
+  [aiBtn, humanBtn].forEach((btn) => modesContainer.appendChild(btn));
   attachListeners(aiBtn, humanBtn);
 
   starterDiv.appendChild(starterDivContainer);
-  document.body.appendChild(starterDiv);
+  document.body.insertBefore(starterDiv, footer);
   playerOneDiv.style.display = 'none';
 }

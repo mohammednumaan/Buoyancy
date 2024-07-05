@@ -22,7 +22,8 @@ async function handlePlayerOneTurn(isAi, playerOne, playerTwo) {
       playerOneContainer.childNodes,
       playerTwoContainer.childNodes,
     );
-    await domInterface.createTimeoutScreen('Hand it Over');
+    await domInterface.createTimeoutScreen('Attack', 'Player Two');
+
     domInterface.renderBoards(playerTwoContainer, playerOneContainer);
   }
   playerOne.changeTurn(playerTwo);
@@ -37,7 +38,8 @@ async function handlePlayerTwoTurn(isAi, playerOne, playerTwo) {
       playerOneContainer.childNodes,
     );
 
-    await domInterface.createTimeoutScreen('Hand it Over');
+    await domInterface.createTimeoutScreen('Attack', 'Player One');
+
     domInterface.renderBoards(playerOneContainer, playerTwoContainer);
   } else {
     ShipDOM.attackShipAI(playerOne, playerOneContainer);
@@ -79,45 +81,32 @@ async function attackLogic(gameState) {
   return Promise.resolve();
 }
 
-// a simple function that resets the board for ship placement
-export function resetPlacement(homePlayer, homeDomBoard) {
-  const placedShips = document.querySelectorAll(
-    `.${homeDomBoard.className} > .placed-ship`,
-  );
-  const shipContainers = Array.from(dashboardContainer.children).slice(1);
-
-  placedShips.forEach((ship) => ship.classList.remove('placed-ship'));
-  shipContainers.forEach((container) => container.remove());
-  domInterface.createShipContainers(homePlayer);
-
-  homePlayer.gameBoard = new Gameboard();
+export function changeDomShipDirection(currentShip, shipContainer) {
+  shipContainer.style['flex-direction'] = currentShip.vertical
+    ? 'row'
+    : 'column';
+  currentShip.changeDirection();
 }
 
-export function changeDomShipDirection(currentShip, shipContainer){
+function openGameOverModal(winner) {
+  const modal = document.createElement('div');
+  const modalContainer = document.createElement('div');
 
-  shipContainer.style['flex-direction'] = currentShip.vertical ? 'row' : 'column'  
-  currentShip.changeDirection();  
-}
+  const h2El = document.createElement('h2');
+  const playBtn = document.createElement('button');
 
-function openGameOverModal(winner){
-  const modal = document.createElement('div')
-  const modalContainer = document.createElement('div')
-  
-  const h2El = document.createElement('h2')
-  const playBtn = document.createElement('button')
+  modal.className = 'game-over-modal';
+  modalContainer.className = 'game-over-modal-container';
 
-  modal.className = 'game-over-modal'
-  modalContainer.className = 'game-over-modal-container'
+  h2El.className = 'game-over-text';
+  playBtn.id = 'play-again-btn';
 
-  h2El.className = 'game-over-text'
-  playBtn.id = 'play-again-btn'
+  h2El.textContent = `${winner} Wins The Batte!`;
+  playBtn.textContent = 'Play Again';
 
-  h2El.textContent = `${winner} Wins The Batte!`
-  playBtn.textContent = 'Play Again'
-
-  Array.from([h2El, playBtn]).forEach(el => modalContainer.appendChild(el))
-  modal.appendChild(modalContainer)
-  document.body.appendChild(modal)
+  [h2El, playBtn].forEach((el) => modalContainer.appendChild(el));
+  modal.appendChild(modalContainer);
+  document.body.appendChild(modal);
 }
 
 // an async function controls the main game flow
@@ -130,9 +119,10 @@ async function gameLogic(isAi) {
   // initialize playerOne's boards and wait for ship placement
   domInterface.createBoards(playerOneContainer);
   await ShipDOM.placeShips(playerOne, playerOneContainer);
-  await domInterface.createTimeoutScreen('Get Ready');
 
   if (!isAi) {
+    await domInterface.createTimeoutScreen('Place Ships', 'Player Two');
+
     playerOneDiv.style.display = 'none';
     playerTwoDiv.style.display = 'block';
 
@@ -140,8 +130,8 @@ async function gameLogic(isAi) {
     domInterface.createBoards(playerTwoContainer);
     await ShipDOM.placeShips(playerTwo, playerTwoContainer);
 
-    await domInterface.createTimeoutScreen('Hand It Over');
-    dashboard.style.display = 'none';
+    await domInterface.createTimeoutScreen('Begin The Battle!', 'Player One');
+    dashboard.remove();
 
     // display both the gameboards and start the game
     playerOneDiv.style.display = 'block';
@@ -153,6 +143,11 @@ async function gameLogic(isAi) {
       gameStatus,
     });
   } else {
+    await domInterface.createTimeoutScreen(
+      'Begin The Battle!',
+      'Click Continue',
+      true,
+    );
     domInterface.createBoards(playerTwoContainer);
     ShipDOM.placeAIShips(playerTwo);
 
@@ -169,7 +164,9 @@ async function gameLogic(isAi) {
 
   if (gameStatus.gameover) {
     const winner = (gameStatus.turns % 2) - 1;
-    winner !== 0 ? openGameOverModal('Player One') : openGameOverModal('Player Two')
+    winner !== 0
+      ? openGameOverModal('Player One')
+      : openGameOverModal('Player Two');
   }
 }
 

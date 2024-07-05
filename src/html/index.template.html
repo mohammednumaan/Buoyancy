@@ -12,15 +12,13 @@
     </div>
 
     <div class="game-container">
-
-    
         <div class="board-container">
 
             <div class="dashboard">
                 <div class="dashboard-container">
                     <h4>Your Ships</h4>
                 </div>
-                <div id="reset-btn">Reset</div>
+                <button id="reset-btn" disabled>Reset</button>
             </div>
             
             <div class="player-one">
@@ -36,10 +34,14 @@
     </div>
 
     <div class="timeout-screen">
-        <button>Continue &rarr;</button>
+        <h2 id="timeout-message"></h2>
+        <h3 id="player-turn"></h3>
+        <button id="continue-game-btn">Continue &rarr;</button>
     </div>
 
-    
-    
+    <div class="footer">
+        <p>A Mohammed Numaan Production</p>
+        <a href="https://github.com/mohammednumaan"><img src="/src/assets/github.png" width="28px" height="28px"></a>
+    </div>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const { resetPlacement } = require('../gameLogic');
+const Gameboard = require('../gameboard');
 const domInterface = require('./domInterface');
 
 class ShipDOM {
@@ -6,14 +6,22 @@ class ShipDOM {
 
   // an async function that controls the flow of ship plcaement
   static async placeShips(homePlayer, homeDomBoard) {
+    let isAllPlaced = false;
     const dashboardContainer = document.querySelector('.dashboard-container');
     const resetBtn = document.getElementById('reset-btn');
 
-    let isAllPlaced = false;
-    resetBtn.onclick = () => resetPlacement(homePlayer, homeDomBoard);
+    resetBtn.addEventListener('click', () => {
+      ShipDOM.#resetPlacement(homePlayer, homeDomBoard);
+      resetBtn.disabled = true
+    });
     domInterface.createShipContainers(homePlayer);
 
     while (!isAllPlaced) {
+      const dashboardChildren = Array.from(dashboardContainer.children).slice(
+        1,
+      );
+      resetBtn.disabled = !(dashboardChildren.length < 5);
+
       try {
         await ShipDOM.#delegateShipDrop(homePlayer, homeDomBoard);
         isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
@@ -22,6 +30,7 @@ class ShipDOM {
       }
     }
 
+    resetBtn.disabled = true;
     return Promise.resolve();
   }
 
@@ -104,15 +113,15 @@ class ShipDOM {
   static #delgateAIPlacement(currShip, enemyPlayer) {
     const [x, y] = ShipDOM.#generateRandomCoords();
     const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
-    
+
     if (directionChoice) currShip.changeDirection();
-    
+
     if (!enemyPlayer.gameBoard.isValidCoords(currShip, x, y)) {
       return ShipDOM.#delgateAIPlacement(currShip, enemyPlayer);
     }
     enemyPlayer.gameBoard.placeShip(currShip, x, y);
     ShipDOM.#markPlacedShip('player-two-board', currShip, x, y, true);
-    console.log(enemyPlayer.gameBoard.board)
+    console.log(enemyPlayer.gameBoard.board);
   }
 
   // a simple method that places all AI's ships
@@ -186,6 +195,26 @@ class ShipDOM {
         signal: abortController.signal,
       });
     });
+  }
+
+  // resets the board for ship placement by removing
+  // existing ships and recreating the ship containers
+  static #resetPlacement(homePlayer, homeDomBoard) {
+    const dashboardContainer = document.querySelector('.dashboard-container');
+
+    // retrieve all the placed ships
+    const placedShips = document.querySelectorAll(
+      `.${homeDomBoard.className} > .placed-ship`,
+    );
+    const shipContainers = Array.from(dashboardContainer.children).slice(1);
+
+    // remove the placed ships from the board and re-create the ship containers
+    placedShips.forEach((ship) => ship.classList.remove('placed-ship'));
+    shipContainers.forEach((container) => container.remove());
+    domInterface.createShipContainers(homePlayer);
+
+    // replace the exisiting gameboard object with a new one
+    homePlayer.gameBoard = new Gameboard();
   }
 }
 

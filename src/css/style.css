@@ -7,16 +7,62 @@
     --color: #9e88fd;
     --place: #957eff    ;
 }
+
 body{
     margin: 0;
     padding: 0;
     font-family: poppins;
     background-color: black;
 }
+button{
+    border: 1px solid #d9d4ff;
+    border-radius: 10px;
+
+    font-size: 16px;
+    cursor: pointer;
+
+    background-color: #d9d4ff;
+    color: #511dba;
+}
+
+button:hover{
+    border-color: #511dba;
+    background-color: #511dba;
+    color: #d9d4ff;
+}
+
+button:hover:disabled{
+    color: #d9d4ff; 
+}
+
+button:disabled{    
+    cursor: not-allowed;
+    border-color: #7776bb;
+    background-color: #7776bb;
+    color: #d9d4ff; 
+
+
+}
 
 .header{
     text-align: center;
     color: var(--color);
+}
+
+.footer{
+
+    position: absolute;
+    color: var(--color);
+    bottom: 20px;
+    left: 42%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    
+
+    
 }
 
 .game-container{
@@ -88,14 +134,8 @@ body{
 }
 
 #reset-btn{
-    text-align: center;
     width: 33vh;
     height: 26px;
-
-    border: 1px solid var(--color);
-    border-radius: 10px;
-    color: var(--place);
-    cursor: pointer;
 }
 
 
@@ -144,6 +184,7 @@ body{
     display: none;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     color: var(--color);
 
     position: absolute;
@@ -154,8 +195,14 @@ body{
     left: 0;
 
     backdrop-filter: blur(100px);
-    animation: fadeInAnimation ease-in 7s;
-    animation-iteration-count: 1;
+    /* animation: fadeInAnimation ease-in 7s;
+    animation-iteration-count: 1; */
+
+}
+
+#continue-game-btn{
+    width: 23vh;
+    height: 30px;
 
 }
 
@@ -198,13 +245,6 @@ body{
 .game-mode-buttons > button{
     width: 290px;
     height: 30px;
-
-    background-color: #d9d4ff;
-    border: 1px solid #d9d4ff;
-    border-radius: 10px;
-
-    font-size: 16px;
-    cursor: pointer;
 }
 
 .game-mode-buttons{

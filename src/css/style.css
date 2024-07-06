@@ -52,6 +52,7 @@ button:disabled{
 .footer{
 
     position: absolute;
+    z-index: -1;
     color: var(--color);
     bottom: 20px;
     left: 42%;
@@ -88,15 +89,15 @@ button:disabled{
     margin-right: 10vh;
     
     padding: 10px;
-    padding-left: 20px;
-    border: 1px solid var(--color);
-    border-radius: 8px;
+    /* padding-left: 20px; */
+    border: 6px solid var(--color);
+    border-radius: 10px;
     overflow-y: auto;
 }
 
 /* width */
 ::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
   }
   
   /* Track */
@@ -107,26 +108,22 @@ button:disabled{
   
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: var(--color);
+    background: #d9d4ff;
     border-radius: 6px;
   }
 
 .dashboard-container > h4{
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: var(--place);
 } 
-
-/* .ship-overview{
-    width: 30px;
-    height: 30px;
-    border: 1px solid black;
-} */
-
 
 .ship-container{
     display: flex;
     flex-direction: row;
     width: fit-content;
+    margin-left: 2vh;
 }
 
 .ship-cell{
@@ -168,6 +165,7 @@ button:disabled{
     margin-right: 4vh;
     width: 500px;
     height: 500px;
+    border: 6px solid var(--color);
 }
 
 .board-cell{
@@ -195,8 +193,6 @@ button:disabled{
     left: 0;
 
     backdrop-filter: blur(100px);
-    /* animation: fadeInAnimation ease-in 7s;
-    animation-iteration-count: 1; */
 
 }
 
@@ -204,19 +200,6 @@ button:disabled{
     width: 23vh;
     height: 30px;
 
-}
-
-@keyframes fadeInAnimation {
-    0% {
-        opacity: 1;
-    }
-
-    90% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
 }
 
 .attacked-ship{
@@ -253,7 +236,7 @@ button:disabled{
 }
 
 .game-over-modal{
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     color: var(--color);
@@ -266,6 +249,16 @@ button:disabled{
     left: 0;
 
     backdrop-filter: blur(100px);
-    animation: fadeInAnimation ease-in 7s;
-    animation-iteration-count: 1;
+}
+
+.game-over-modal-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#play-again-btn{
+    width: 24vh;
+    height: 25px;
 }

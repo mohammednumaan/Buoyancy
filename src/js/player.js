@@ -1,5 +1,5 @@
-const Gameboard = require('./gameboard');
-const Ship = require('./ship');
+const Gameboard = require("./gameboard");
+const Ship = require("./ship");
 
 class Player {
   constructor(turn, isAi = false) {
@@ -11,7 +11,6 @@ class Player {
 
   changeTurn(enemyPlayer) {
     this.turn = false;
-    /* eslint-disable no-param-reassign */
     enemyPlayer.turn = true;
   }
 }

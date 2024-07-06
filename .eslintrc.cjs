@@ -1,5 +1,5 @@
 module.exports = {
-
+    
     "env": {
         "browser": true,
         "es2021": true,
@@ -16,12 +16,11 @@ module.exports = {
 
     rules:{
         "no-await-in-loop": "off",
-        "no-nested-ternary": "off"
-        // "no-param-reassign": "off",
-        // "radix": "off",
+        "no-nested-ternary": "off",
+        "no-param-reassign": "off",
     },
 
     "root": true,
-    "extends": ["eslint:recommended", "prettier", "airbnb-base" ],
+    "extends": ["prettier", "airbnb-base" ],
     "ignorePatterns": ["node_modules/", "**/*.cjs", "dist/"]
 }

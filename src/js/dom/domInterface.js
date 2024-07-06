@@ -1,4 +1,4 @@
-const { changeDomShipDirection } = require("../gameLogic");
+const shipDomInterface = require("./shipDomInterface");
 
 class domInterface {
   static playerOneDiv = document.querySelector(".player-one");
@@ -10,8 +10,6 @@ class domInterface {
   static playerOneTitle = document.createElement("h4");
 
   static playerTwoTitle = document.createElement("h4");
-
-  /* eslint-disable no-param-reassign */
 
   // a simple loop to create a 10x10 grid for
   // players to place and attack ships
@@ -60,7 +58,10 @@ class domInterface {
       );
 
       shipContainer.addEventListener("click", (e) =>
-        changeDomShipDirection(homePlayer.allShips[i], e.currentTarget),
+        shipDomInterface.changeDomShipDirection(
+          homePlayer.allShips[i],
+          e.currentTarget,
+        ),
       );
       dashboardContainer.appendChild(shipContainer);
     }
@@ -74,14 +75,14 @@ class domInterface {
       div.replaceChildren(),
     );
 
-    // render board names appropriately based on the 
+    // render board names appropriately based on the
     // current player's turn
     domInterface.playerOneTitle.textContent =
       homeDomBoard.className === "player-one-board"
         ? "Player One's Board"
         : "Player Two's Board";
-    domInterface.playerTwoTitle.textContent = 
-      enemyDomBoard.className === " player-one-board"
+    domInterface.playerTwoTitle.textContent =
+      enemyDomBoard.className === "player-one-board"
         ? "Player One's Board"
         : "Player Two's Board";
 
@@ -137,16 +138,22 @@ class domInterface {
 
     return new Promise((resolve) => {
       const timerId = setTimeout(() => {
-        timeoutScreen.style.display = 'flex'
-        timeoutHeader.textContent = headerText
-        timeoutPlayer.textContent = (isAi) ? `${subHeaderText}` : `${subHeaderText}'s Turn`
-      }, 2000)
+        timeoutScreen.style.display = "flex";
+        timeoutHeader.textContent = headerText;
+        timeoutPlayer.textContent = isAi
+          ? `${subHeaderText}`
+          : `${subHeaderText}'s Turn`;
+      }, 2000);
 
-      continueBtn.addEventListener('click', (e) => {
-        clearTimeout(timerId)  
-        timeoutScreen.style.display = 'none'
-        resolve(e)
-      },{once: true})
+      continueBtn.addEventListener(
+        "click",
+        (e) => {
+          clearTimeout(timerId);
+          timeoutScreen.style.display = "none";
+          resolve(e);
+        },
+        { once: true },
+      );
     });
   }
 
@@ -177,6 +184,42 @@ class domInterface {
   static dragoverHandler(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
+  }
+
+  static openGameOverModal(winner, isAi) {
+    const modal = document.createElement("div");
+    const modalContainer = document.createElement("div");
+
+    const h2El = document.createElement("h2");
+    const playBtn = document.createElement("button");
+
+    modal.className = "game-over-modal";
+    modalContainer.className = "game-over-modal-container";
+    playBtn.id = "play-again-btn";
+
+    h2El.textContent =
+      isAi && winner === "Player Two"
+        ? `${winner} (Ai) Wins The Battle.`
+        : `${winner} Wins The Battle.`;
+    playBtn.textContent = "Play Again?";
+
+    [h2El, playBtn].forEach((el) => modalContainer.appendChild(el));
+    modal.appendChild(modalContainer);
+    document.body.appendChild(modal);
+
+    playBtn.addEventListener(
+      "click",
+      () => {
+        [playerOneDiv, playerTwoDiv]
+          .forEach((el) => (el.style.display = "none"))
+          [
+            (playerOneContainer, playerTwoContainer)
+          ].forEach((el) => el.replaceChildren());
+        modal.remove();
+        starterDOM();
+      },
+      { once: true },
+    );
   }
 }
 

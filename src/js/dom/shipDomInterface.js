@@ -1,18 +1,18 @@
-const Gameboard = require('../gameboard');
-const domInterface = require('./domInterface');
+const Gameboard = require("../gameboard");
+const domInterface = require("./domInterface");
 
-class ShipDOM {
-  static #generatedCoords = [];
+class shipDomInterface {
+  static #generatedCoords = [[null, null]];
 
   // an async function that controls the flow of ship plcaement
   static async placeShips(homePlayer, homeDomBoard) {
     let isAllPlaced = false;
-    const dashboardContainer = document.querySelector('.dashboard-container');
-    const resetBtn = document.getElementById('reset-btn');
+    const dashboardContainer = document.querySelector(".dashboard-container");
+    const resetBtn = document.getElementById("reset-btn");
 
-    resetBtn.addEventListener('click', () => {
-      ShipDOM.#resetPlacement(homePlayer, homeDomBoard);
-      resetBtn.disabled = true
+    resetBtn.addEventListener("click", () => {
+      shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
+      resetBtn.disabled = true;
     });
     domInterface.createShipContainers(homePlayer);
 
@@ -23,10 +23,10 @@ class ShipDOM {
       resetBtn.disabled = !(dashboardChildren.length < 5);
 
       try {
-        await ShipDOM.#delegateShipDrop(homePlayer, homeDomBoard);
+        await shipDomInterface.#delegateShipDrop(homePlayer, homeDomBoard);
         isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
       } catch (err) {
-        console.log(err);
+        return err;
       }
     }
 
@@ -42,16 +42,16 @@ class ShipDOM {
 
       if (!cell) return;
 
-      cell.classList.add('placed-ship');
-      if (isAi) cell.style.backgroundColor = 'black';
+      cell.classList.add("placed-ship");
+      if (isAi) cell.style.backgroundColor = "black";
     }
   }
 
   static #attackedShipClass(cell) {
     cell.classList.add(
-      cell.classList.contains('placed-ship')
-        ? 'attacked-ship'
-        : 'missed-attack',
+      cell.classList.contains("placed-ship")
+        ? "attacked-ship"
+        : "missed-attack",
     );
   }
 
@@ -64,11 +64,11 @@ class ShipDOM {
           e.target.dataset.y,
         );
 
-        if (!e.target.classList.contains('board-cell')) {
+        if (!e.target.classList.contains("board-cell")) {
           return reject(e);
         }
         if (enemyPlayer.gameBoard.recieveAttack(xCoord, yCoord)) {
-          ShipDOM.#attackedShipClass(e.target);
+          shipDomInterface.#attackedShipClass(e.target);
           resolve(e);
         }
 
@@ -78,32 +78,42 @@ class ShipDOM {
       // attach click event listener that listens to the event only once
       // to avoid unintentional behaviour such as registering an attack
       // when its **not** the player's turn)
-      enemyDomBoard.addEventListener('click', handleClick, { once: true });
+      enemyDomBoard.addEventListener("click", handleClick, { once: true });
     });
   }
 
   //
   static async attackShip(enemyDomBoard, enemyPlayer) {
     try {
-      await ShipDOM.#delegateShipAttack(enemyDomBoard, enemyPlayer);
+      await shipDomInterface.#delegateShipAttack(enemyDomBoard, enemyPlayer);
     } catch (err) {
-      await ShipDOM.attackShip(enemyDomBoard, enemyPlayer);
+      await shipDomInterface.attackShip(enemyDomBoard, enemyPlayer);
     }
   }
 
   // a simple method that generates unique and random [x, y] tuples
   // for the AI to attack and place ships on its board
-  static #generateRandomCoords() {
-    const coordsArr = [
+  static #generateRandomCoords(forPlacement = false) {
+    let coordsArr = [
       Math.floor(Math.random() * 10),
       Math.floor(Math.random() * 10),
     ];
 
     // if the generatedCoords array includes the newly created [x, y] tuple,
     // run this function recursively until it finds a unique one
-    !ShipDOM.#generatedCoords.includes(coordsArr)
-      ? ShipDOM.#generatedCoords.push(coordsArr)
-      : ShipDOM.#generateRandomCoords();
+    shipDomInterface.#generatedCoords.forEach((coord) => {
+      if (coord[0] === coordsArr[0] && coord[1] === coordsArr[1]) {
+        coordsArr = shipDomInterface.#generateRandomCoords();
+      }
+    });
+
+    // if the generated coords for ship placement, do not push
+    // them into the generated coords array to avoid **ignoring**
+    // the coords during attack
+    if (!forPlacement) {
+      shipDomInterface.#generatedCoords.push(coordsArr);
+    }
+    console.log(shipDomInterface.#generatedCoords.length);
     return coordsArr;
   }
 
@@ -111,34 +121,43 @@ class ShipDOM {
   // delegate AI's ship placement on its board by randomly generating
   // [x, y] tuples to place a ship
   static #delgateAIPlacement(currShip, enemyPlayer) {
-    const [x, y] = ShipDOM.#generateRandomCoords();
+    const [x, y] = shipDomInterface.#generateRandomCoords(true);
     const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
 
     if (directionChoice) currShip.changeDirection();
 
     if (!enemyPlayer.gameBoard.isValidCoords(currShip, x, y)) {
-      return ShipDOM.#delgateAIPlacement(currShip, enemyPlayer);
+      return shipDomInterface.#delgateAIPlacement(currShip, enemyPlayer);
     }
     enemyPlayer.gameBoard.placeShip(currShip, x, y);
-    ShipDOM.#markPlacedShip('player-two-board', currShip, x, y, true);
-    console.log(enemyPlayer.gameBoard.board);
+    shipDomInterface.#markPlacedShip("player-two-board", currShip, x, y, true);
   }
 
   // a simple method that places all AI's ships
   static placeAIShips(enemyPlayer) {
-    enemyPlayer.allShips.forEach((ship) => ShipDOM.#delgateAIPlacement(ship, enemyPlayer));
+    enemyPlayer.allShips.forEach((ship) =>
+      shipDomInterface.#delgateAIPlacement(ship, enemyPlayer),
+    );
   }
 
   // a simple method that attacks the enemy player's (homePlayer)
   // board by generating random [x, y] tuples
   static attackShipAI(enemyPlayer, enemyDomBoard) {
-    const [x, y] = ShipDOM.#generateRandomCoords();
-    if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
-      const cell = domInterface.getCellElement(x, y, enemyDomBoard.className);
-      ShipDOM.#attackedShipClass(cell);
-    } else {
-      ShipDOM.attackShipAI(enemyPlayer, enemyDomBoard);
-    }
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const [x, y] = shipDomInterface.#generateRandomCoords();
+        console.log([x, y]);
+        if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
+          const cell = domInterface.getCellElement(
+            x,
+            y,
+            enemyDomBoard.className,
+          );
+          shipDomInterface.#attackedShipClass(cell);
+          resolve();
+        }
+      }, 500);
+    });
   }
 
   static async #delegateShipDrop(homePlayer, homeDomBoard) {
@@ -150,13 +169,13 @@ class ShipDOM {
         e.preventDefault();
 
         // retrieve the dragged element's index
-        const index = e.dataTransfer.getData('application/index');
+        const index = e.dataTransfer.getData("application/index");
 
         // retrieve the corresponding shipContainer based on the retrieved index
         const shipContainer = document.querySelector(`[data-index="${index}"]`);
         const shipCells = [...shipContainer.children];
 
-        if (!e.target.classList.contains('board-cell')) return;
+        if (!e.target.classList.contains("board-cell")) return;
 
         const [x, y] = domInterface.getCellCoords(e.target);
         const currentShip = homePlayer.allShips[Number(index)];
@@ -173,7 +192,7 @@ class ShipDOM {
           // retrieve the shipCell from the shipContainer and assign it [x, y] dataset coords
           shipCells[i].dataset.x = !currentShip.vertical ? x : x + i;
           shipCells[i].dataset.y = !currentShip.vertical ? y + i : y;
-          shipCells[i].classList.remove('ship-cell');
+          shipCells[i].classList.remove("ship-cell");
 
           // replace the homeDomBoard's cell with [x, y] coord with the retrieved shipCell
           cell.replaceWith(shipCells[i]);
@@ -183,15 +202,20 @@ class ShipDOM {
 
         // remove the shipContainer from the dashboard as an indication of it being placed
         shipContainer.remove();
-        ShipDOM.#markPlacedShip(homeDomBoard.className, currentShip, x, y);
+        shipDomInterface.#markPlacedShip(
+          homeDomBoard.className,
+          currentShip,
+          x,
+          y,
+        );
 
         abortController.abort();
         resolve(e);
       };
-      homeDomBoard.addEventListener('dragover', domInterface.dragoverHandler, {
+      homeDomBoard.addEventListener("dragover", domInterface.dragoverHandler, {
         signal: abortController.signal,
       });
-      homeDomBoard.addEventListener('drop', dropHandler, {
+      homeDomBoard.addEventListener("drop", dropHandler, {
         signal: abortController.signal,
       });
     });
@@ -200,7 +224,7 @@ class ShipDOM {
   // resets the board for ship placement by removing
   // existing ships and recreating the ship containers
   static #resetPlacement(homePlayer, homeDomBoard) {
-    const dashboardContainer = document.querySelector('.dashboard-container');
+    const dashboardContainer = document.querySelector(".dashboard-container");
 
     // retrieve all the placed ships
     const placedShips = document.querySelectorAll(
@@ -209,13 +233,20 @@ class ShipDOM {
     const shipContainers = Array.from(dashboardContainer.children).slice(1);
 
     // remove the placed ships from the board and re-create the ship containers
-    placedShips.forEach((ship) => ship.classList.remove('placed-ship'));
+    placedShips.forEach((ship) => ship.classList.remove("placed-ship"));
     shipContainers.forEach((container) => container.remove());
     domInterface.createShipContainers(homePlayer);
 
     // replace the exisiting gameboard object with a new one
     homePlayer.gameBoard = new Gameboard();
   }
+
+  static changeDomShipDirection(currentShip, shipContainer) {
+    shipContainer.style["flex-direction"] = currentShip.vertical
+      ? "row"
+      : "column";
+    currentShip.changeDirection();
+  }
 }
 
-module.exports = ShipDOM;
+module.exports = shipDomInterface;

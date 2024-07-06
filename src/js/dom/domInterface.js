@@ -1,6 +1,6 @@
-const shipDomInterface = require("./shipDomInterface");
+import shipDomInterface from "./shipDomInterface";
 
-class domInterface {
+export default class domInterface {
   static playerOneDiv = document.querySelector(".player-one");
 
   static playerTwoDiv = document.querySelector(".player-two");
@@ -210,11 +210,8 @@ class domInterface {
     playBtn.addEventListener(
       "click",
       () => {
-        [playerOneDiv, playerTwoDiv]
-          .forEach((el) => (el.style.display = "none"))
-          [
-            (playerOneContainer, playerTwoContainer)
-          ].forEach((el) => el.replaceChildren());
+        [domInterface.playerOneDiv, domInterface.playerTwoDiv].forEach((el) => (el.style.display = "none"))
+        [domInterface.playerOneContainer, domInterface.playerTwoContainer].forEach((el) => el.replaceChildren());
         modal.remove();
         starterDOM();
       },
@@ -223,4 +220,3 @@ class domInterface {
   }
 }
 
-module.exports = domInterface;

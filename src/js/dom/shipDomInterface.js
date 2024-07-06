@@ -1,7 +1,8 @@
-const Gameboard = require("../gameboard");
-const domInterface = require("./domInterface");
+import domInterface from "./domInterface";
 
-class shipDomInterface {
+const Gameboard = require("../gameboard");
+
+export default class shipDomInterface {
   static #generatedCoords = [[null, null]];
 
   // an async function that controls the flow of ship plcaement
@@ -248,5 +249,3 @@ class shipDomInterface {
     currentShip.changeDirection();
   }
 }
-
-module.exports = shipDomInterface;

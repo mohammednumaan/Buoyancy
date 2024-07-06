@@ -1,9 +1,8 @@
 // imports
+import domInterface from "./dom/domInterface";
 import shipDomInterface from "./dom/shipDomInterface";
-import starterDOM from "./dom/starterDom";
 import Gameboard from "./gameboard";
 
-const domInterface = require("./dom/domInterface");
 const Player = require("./player");
 
 const dashboard = document.querySelector(".dashboard");
@@ -81,7 +80,7 @@ async function attackLogic(gameState) {
 }
 
 // an async function controls the main game flow
-async function gameLogic(isAi) {
+export default async function gameLogic(isAi) {
   // intialize players and game status
   const playerOne = new Player(true, false);
   const playerTwo = new Player(false, isAi);
@@ -143,5 +142,3 @@ async function gameLogic(isAi) {
       : domInterface.openGameOverModal("Player Two", isAi);
   }
 }
-
-export default gameLogic;

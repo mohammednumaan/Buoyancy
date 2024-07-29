@@ -1,6 +1,6 @@
-import domInterface from "./domInterface";
+import domInterface from './domInterface';
 
-const Gameboard = require("../gameboard");
+const Gameboard = require('../gameboard');
 
 export default class shipDomInterface {
   static #generatedCoords = [[null, null]];
@@ -8,31 +8,52 @@ export default class shipDomInterface {
   // an async function that controls the flow of ship plcaement
   static async placeShips(homePlayer, homeDomBoard) {
     let isAllPlaced = false;
-    const dashboardContainer = document.querySelector(".dashboard-container");
-    const resetBtn = document.getElementById("reset-btn");
+    
+    const dashboardContainer = document.querySelector('.dashboard-container');
+    const resetBtn = document.getElementById('reset-btn');
+    
+    // create/render the ship containers for placement
+    domInterface.createShipContainers(homePlayer);
 
-    resetBtn.addEventListener("click", () => {
+    // event listener to handle ship placement reset
+    resetBtn.addEventListener('click', async () => {
       shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
       resetBtn.disabled = true;
     });
-    domInterface.createShipContainers(homePlayer);
 
+    // wait until all ships are placed
     while (!isAllPlaced) {
-      const dashboardChildren = Array.from(dashboardContainer.children).slice(
-        1,
-      );
-      resetBtn.disabled = !(dashboardChildren.length < 5);
-
+      resetBtn.disabled = !(Array.from(dashboardContainer.children).slice(1).length < 5);
+      
       try {
+        
         await shipDomInterface.#delegateShipDrop(homePlayer, homeDomBoard);
-        isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
+        isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;;
       } catch (err) {
         return err;
       }
     }
 
-    resetBtn.disabled = true;
-    return Promise.resolve();
+    // disable the reset button to avoid clearing the 
+    // board after all ships have been placed and enable 
+    // confirm button to confirm placement and continue
+    resetBtn.removeEventListener('click', )
+    await shipDomInterface.confirmShipPlacement(homePlayer, homeDomBoard);
+  }
+
+  static async confirmShipPlacement(homePlayer, homeDomBoard){
+    return new Promise((resolve) => {
+      const confirmBtn = document.getElementById('confirm-btn');
+      const resetBtn = document.getElementById('reset-btn');
+
+      confirmBtn.disabled = false;
+      const handleClick = (e) => resolve(e);
+      const hanldeReset = () => shipDomInterface.placeShips(homePlayer, homeDomBoard);
+      confirmBtn.onclick = handleClick;
+      resetBtn.onclick = hanldeReset;
+
+    })
+
   }
 
   static #markPlacedShip(domBoardClass, currentShip, x, y, isAi = false) {
@@ -43,16 +64,16 @@ export default class shipDomInterface {
 
       if (!cell) return;
 
-      cell.classList.add("placed-ship");
-      if (isAi) cell.style.backgroundColor = "black";
+      cell.classList.add('placed-ship');
+      if (isAi) cell.style.backgroundColor = 'black';
     }
   }
 
   static #attackedShipClass(cell) {
     cell.classList.add(
-      cell.classList.contains("placed-ship")
-        ? "attacked-ship"
-        : "missed-attack",
+      cell.classList.contains('placed-ship')
+        ? 'attacked-ship'
+        : 'missed-attack',
     );
   }
 
@@ -65,7 +86,7 @@ export default class shipDomInterface {
           e.target.dataset.y,
         );
 
-        if (!e.target.classList.contains("board-cell")) {
+        if (!e.target.classList.contains('board-cell')) {
           return reject(e);
         }
         if (enemyPlayer.gameBoard.recieveAttack(xCoord, yCoord)) {
@@ -78,12 +99,12 @@ export default class shipDomInterface {
 
       // attach click event listener that listens to the event only once
       // to avoid unintentional behaviour such as registering an attack
-      // when its **not** the player's turn)
-      enemyDomBoard.addEventListener("click", handleClick, { once: true });
+      // when its **not** the player's turn
+      enemyDomBoard.addEventListener('click', handleClick, { once: true });
     });
   }
 
-  //
+  // control flow for attacking enemy ships
   static async attackShip(enemyDomBoard, enemyPlayer) {
     try {
       await shipDomInterface.#delegateShipAttack(enemyDomBoard, enemyPlayer);
@@ -108,13 +129,12 @@ export default class shipDomInterface {
       }
     });
 
-    // if the generated coords for ship placement, do not push
+    // if the generated coords are for ship placement, do not push
     // them into the generated coords array to avoid **ignoring**
     // the coords during attack
     if (!forPlacement) {
       shipDomInterface.#generatedCoords.push(coordsArr);
     }
-    console.log(shipDomInterface.#generatedCoords.length);
     return coordsArr;
   }
 
@@ -131,23 +151,20 @@ export default class shipDomInterface {
       return shipDomInterface.#delgateAIPlacement(currShip, enemyPlayer);
     }
     enemyPlayer.gameBoard.placeShip(currShip, x, y);
-    shipDomInterface.#markPlacedShip("player-two-board", currShip, x, y, true);
+    shipDomInterface.#markPlacedShip('player-two-board', currShip, x, y, true);
   }
 
   // a simple method that places all AI's ships
   static placeAIShips(enemyPlayer) {
-    enemyPlayer.allShips.forEach((ship) =>
-      shipDomInterface.#delgateAIPlacement(ship, enemyPlayer),
-    );
+    enemyPlayer.allShips.forEach((ship) => shipDomInterface.#delgateAIPlacement(ship, enemyPlayer));
   }
 
   // a simple method that attacks the enemy player's (homePlayer)
   // board by generating random [x, y] tuples
   static attackShipAI(enemyPlayer, enemyDomBoard) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         const [x, y] = shipDomInterface.#generateRandomCoords();
-        console.log([x, y]);
         if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
           const cell = domInterface.getCellElement(
             x,
@@ -170,13 +187,13 @@ export default class shipDomInterface {
         e.preventDefault();
 
         // retrieve the dragged element's index
-        const index = e.dataTransfer.getData("application/index");
+        const index = e.dataTransfer.getData('application/index');
 
         // retrieve the corresponding shipContainer based on the retrieved index
         const shipContainer = document.querySelector(`[data-index="${index}"]`);
         const shipCells = [...shipContainer.children];
 
-        if (!e.target.classList.contains("board-cell")) return;
+        if (!e.target.classList.contains('board-cell')) return;
 
         const [x, y] = domInterface.getCellCoords(e.target);
         const currentShip = homePlayer.allShips[Number(index)];
@@ -193,7 +210,7 @@ export default class shipDomInterface {
           // retrieve the shipCell from the shipContainer and assign it [x, y] dataset coords
           shipCells[i].dataset.x = !currentShip.vertical ? x : x + i;
           shipCells[i].dataset.y = !currentShip.vertical ? y + i : y;
-          shipCells[i].classList.remove("ship-cell");
+          shipCells[i].classList.remove('ship-cell');
 
           // replace the homeDomBoard's cell with [x, y] coord with the retrieved shipCell
           cell.replaceWith(shipCells[i]);
@@ -209,14 +226,14 @@ export default class shipDomInterface {
           x,
           y,
         );
-
+        
         abortController.abort();
         resolve(e);
       };
-      homeDomBoard.addEventListener("dragover", domInterface.dragoverHandler, {
+      homeDomBoard.addEventListener('dragover', domInterface.dragoverHandler, {
         signal: abortController.signal,
       });
-      homeDomBoard.addEventListener("drop", dropHandler, {
+      homeDomBoard.addEventListener('drop', dropHandler, {
         signal: abortController.signal,
       });
     });
@@ -225,16 +242,16 @@ export default class shipDomInterface {
   // resets the board for ship placement by removing
   // existing ships and recreating the ship containers
   static #resetPlacement(homePlayer, homeDomBoard) {
-    const dashboardContainer = document.querySelector(".dashboard-container");
+    const dashboardContainer = document.querySelector('.dashboard-container');
 
-    // retrieve all the placed ships
+    // retrieve all the placed ships  
     const placedShips = document.querySelectorAll(
       `.${homeDomBoard.className} > .placed-ship`,
     );
     const shipContainers = Array.from(dashboardContainer.children).slice(1);
 
     // remove the placed ships from the board and re-create the ship containers
-    placedShips.forEach((ship) => ship.classList.remove("placed-ship"));
+    placedShips.forEach((ship) => ship.classList.remove('placed-ship'));
     shipContainers.forEach((container) => container.remove());
     domInterface.createShipContainers(homePlayer);
 
@@ -242,10 +259,11 @@ export default class shipDomInterface {
     homePlayer.gameBoard = new Gameboard();
   }
 
+  
   static changeDomShipDirection(currentShip, shipContainer) {
-    shipContainer.style["flex-direction"] = currentShip.vertical
-      ? "row"
-      : "column";
+    shipContainer.style['flex-direction'] = currentShip.vertical
+      ? 'row'
+      : 'column';
     currentShip.changeDirection();
   }
 }

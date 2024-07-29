@@ -130,7 +130,8 @@ button:disabled{
     background-color: #957eff;
 }
 
-#reset-btn{
+#reset-btn,
+#confirm-btn{
     width: 33vh;
     height: 26px;
 }
@@ -262,3 +263,16 @@ button:disabled{
     width: 24vh;
     height: 25px;
 }
+
+#github-icon:hover{
+    animation: rotateIcon 1s ease-in-out;
+}
+
+@keyframes rotateIcon {
+
+    100% {
+        transform: scale(1.1);
+        transform: rotate(-360deg);
+    }
+
+  }

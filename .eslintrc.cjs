@@ -18,6 +18,7 @@ module.exports = {
         "no-await-in-loop": "off",
         "no-nested-ternary": "off",
         "no-param-reassign": "off",
+        "no-unused-expressions": "off"
     },
 
     "root": true,

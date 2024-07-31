@@ -1,59 +1,47 @@
-import domInterface from './domInterface';
+import Player from "../player";
+import domInterface from "./domInterface";
 
-const Gameboard = require('../gameboard');
+const Gameboard = require("../gameboard");
 
 export default class shipDomInterface {
   static #generatedCoords = [[null, null]];
+  static #adjacentCoords = [];
 
   // an async function that controls the flow of ship plcaement
   static async placeShips(homePlayer, homeDomBoard) {
     let isAllPlaced = false;
-    
-    const dashboardContainer = document.querySelector('.dashboard-container');
-    const resetBtn = document.getElementById('reset-btn');
-    
+
+    const dashboardContainer = document.querySelector(".dashboard-container");
+    const resetBtn = document.getElementById("reset-btn");
+
+    const resetHandler = () => {
+      shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
+      resetBtn.disabled = true;
+    };
+
     // create/render the ship containers for placement
     domInterface.createShipContainers(homePlayer);
 
     // event listener to handle ship placement reset
-    resetBtn.addEventListener('click', async () => {
-      shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
-      resetBtn.disabled = true;
-    });
+    resetBtn.addEventListener("click", resetHandler);
 
     // wait until all ships are placed
     while (!isAllPlaced) {
-      resetBtn.disabled = !(Array.from(dashboardContainer.children).slice(1).length < 5);
-      
+      resetBtn.disabled = !(
+        Array.from(dashboardContainer.children).slice(1).length < 5
+      );
+
       try {
-        
         await shipDomInterface.#delegateShipDrop(homePlayer, homeDomBoard);
-        isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;;
+        isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
       } catch (err) {
         return err;
       }
     }
 
-    // disable the reset button to avoid clearing the 
-    // board after all ships have been placed and enable 
-    // confirm button to confirm placement and continue
-    resetBtn.removeEventListener('click', )
-    await shipDomInterface.confirmShipPlacement(homePlayer, homeDomBoard);
-  }
-
-  static async confirmShipPlacement(homePlayer, homeDomBoard){
-    return new Promise((resolve) => {
-      const confirmBtn = document.getElementById('confirm-btn');
-      const resetBtn = document.getElementById('reset-btn');
-
-      confirmBtn.disabled = false;
-      const handleClick = (e) => resolve(e);
-      const hanldeReset = () => shipDomInterface.placeShips(homePlayer, homeDomBoard);
-      confirmBtn.onclick = handleClick;
-      resetBtn.onclick = hanldeReset;
-
-    })
-
+    resetBtn.disabled = true;
+    resetBtn.removeEventListener("click", resetHandler);
+    return Promise.resolve("All Ships Placed!");
   }
 
   static #markPlacedShip(domBoardClass, currentShip, x, y, isAi = false) {
@@ -64,16 +52,16 @@ export default class shipDomInterface {
 
       if (!cell) return;
 
-      cell.classList.add('placed-ship');
-      if (isAi) cell.style.backgroundColor = 'black';
+      cell.classList.add("placed-ship");
+      if (isAi) cell.style.backgroundColor = "black";
     }
   }
 
   static #attackedShipClass(cell) {
     cell.classList.add(
-      cell.classList.contains('placed-ship')
-        ? 'attacked-ship'
-        : 'missed-attack',
+      cell.classList.contains("placed-ship")
+        ? "attacked-ship"
+        : "missed-attack",
     );
   }
 
@@ -86,7 +74,7 @@ export default class shipDomInterface {
           e.target.dataset.y,
         );
 
-        if (!e.target.classList.contains('board-cell')) {
+        if (!e.target.classList.contains("board-cell")) {
           return reject(e);
         }
         if (enemyPlayer.gameBoard.recieveAttack(xCoord, yCoord)) {
@@ -100,7 +88,7 @@ export default class shipDomInterface {
       // attach click event listener that listens to the event only once
       // to avoid unintentional behaviour such as registering an attack
       // when its **not** the player's turn
-      enemyDomBoard.addEventListener('click', handleClick, { once: true });
+      enemyDomBoard.addEventListener("click", handleClick, { once: true });
     });
   }
 
@@ -113,36 +101,13 @@ export default class shipDomInterface {
     }
   }
 
-  // a simple method that generates unique and random [x, y] tuples
-  // for the AI to attack and place ships on its board
-  static #generateRandomCoords(forPlacement = false) {
-    let coordsArr = [
-      Math.floor(Math.random() * 10),
-      Math.floor(Math.random() * 10),
-    ];
-
-    // if the generatedCoords array includes the newly created [x, y] tuple,
-    // run this function recursively until it finds a unique one
-    shipDomInterface.#generatedCoords.forEach((coord) => {
-      if (coord[0] === coordsArr[0] && coord[1] === coordsArr[1]) {
-        coordsArr = shipDomInterface.#generateRandomCoords();
-      }
-    });
-
-    // if the generated coords are for ship placement, do not push
-    // them into the generated coords array to avoid **ignoring**
-    // the coords during attack
-    if (!forPlacement) {
-      shipDomInterface.#generatedCoords.push(coordsArr);
-    }
-    return coordsArr;
-  }
 
   /* eslint-disable consistent-return */
   // delegate AI's ship placement on its board by randomly generating
   // [x, y] tuples to place a ship
   static #delgateAIPlacement(currShip, enemyPlayer) {
-    const [x, y] = shipDomInterface.#generateRandomCoords(true);
+    
+    const [x, y] = Player.trampolinedCoords(true);
     const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
 
     if (directionChoice) currShip.changeDirection();
@@ -151,12 +116,14 @@ export default class shipDomInterface {
       return shipDomInterface.#delgateAIPlacement(currShip, enemyPlayer);
     }
     enemyPlayer.gameBoard.placeShip(currShip, x, y);
-    shipDomInterface.#markPlacedShip('player-two-board', currShip, x, y, true);
+    shipDomInterface.#markPlacedShip("player-two-board", currShip, x, y, true);
   }
 
   // a simple method that places all AI's ships
   static placeAIShips(enemyPlayer) {
-    enemyPlayer.allShips.forEach((ship) => shipDomInterface.#delgateAIPlacement(ship, enemyPlayer));
+    enemyPlayer.allShips.forEach((ship) =>
+      shipDomInterface.#delgateAIPlacement(ship, enemyPlayer),
+    );
   }
 
   // a simple method that attacks the enemy player's (homePlayer)
@@ -164,7 +131,7 @@ export default class shipDomInterface {
   static attackShipAI(enemyPlayer, enemyDomBoard) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const [x, y] = shipDomInterface.#generateRandomCoords();
+        const [x, y] = Player.trampolinedCoords(  );    
         if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
           const cell = domInterface.getCellElement(
             x,
@@ -178,6 +145,12 @@ export default class shipDomInterface {
     });
   }
 
+  static #getAdjacentCoords(currentCoords) {
+    const [x, y] = currentCoords;
+    const isVertical = false;
+    if (y + 1 > 9 || y - 1 < 0) return;
+  }
+
   static async #delegateShipDrop(homePlayer, homeDomBoard) {
     // create an abort controller to handle removal of event listeners
     const abortController = new AbortController();
@@ -187,13 +160,13 @@ export default class shipDomInterface {
         e.preventDefault();
 
         // retrieve the dragged element's index
-        const index = e.dataTransfer.getData('application/index');
+        const index = e.dataTransfer.getData("application/index");
 
         // retrieve the corresponding shipContainer based on the retrieved index
         const shipContainer = document.querySelector(`[data-index="${index}"]`);
         const shipCells = [...shipContainer.children];
 
-        if (!e.target.classList.contains('board-cell')) return;
+        if (!e.target.classList.contains("board-cell")) return;
 
         const [x, y] = domInterface.getCellCoords(e.target);
         const currentShip = homePlayer.allShips[Number(index)];
@@ -210,7 +183,7 @@ export default class shipDomInterface {
           // retrieve the shipCell from the shipContainer and assign it [x, y] dataset coords
           shipCells[i].dataset.x = !currentShip.vertical ? x : x + i;
           shipCells[i].dataset.y = !currentShip.vertical ? y + i : y;
-          shipCells[i].classList.remove('ship-cell');
+          shipCells[i].classList.remove("ship-cell");
 
           // replace the homeDomBoard's cell with [x, y] coord with the retrieved shipCell
           cell.replaceWith(shipCells[i]);
@@ -226,14 +199,14 @@ export default class shipDomInterface {
           x,
           y,
         );
-        
+
         abortController.abort();
         resolve(e);
       };
-      homeDomBoard.addEventListener('dragover', domInterface.dragoverHandler, {
+      homeDomBoard.addEventListener("dragover", domInterface.dragoverHandler, {
         signal: abortController.signal,
       });
-      homeDomBoard.addEventListener('drop', dropHandler, {
+      homeDomBoard.addEventListener("drop", dropHandler, {
         signal: abortController.signal,
       });
     });
@@ -242,16 +215,15 @@ export default class shipDomInterface {
   // resets the board for ship placement by removing
   // existing ships and recreating the ship containers
   static #resetPlacement(homePlayer, homeDomBoard) {
-    const dashboardContainer = document.querySelector('.dashboard-container');
-
-    // retrieve all the placed ships  
+    const dashboardContainer = document.querySelector(".dashboard-container");
+    // retrieve all the placed ships
     const placedShips = document.querySelectorAll(
       `.${homeDomBoard.className} > .placed-ship`,
     );
     const shipContainers = Array.from(dashboardContainer.children).slice(1);
 
     // remove the placed ships from the board and re-create the ship containers
-    placedShips.forEach((ship) => ship.classList.remove('placed-ship'));
+    placedShips.forEach((ship) => ship.classList.remove("placed-ship"));
     shipContainers.forEach((container) => container.remove());
     domInterface.createShipContainers(homePlayer);
 
@@ -259,11 +231,10 @@ export default class shipDomInterface {
     homePlayer.gameBoard = new Gameboard();
   }
 
-  
   static changeDomShipDirection(currentShip, shipContainer) {
-    shipContainer.style['flex-direction'] = currentShip.vertical
-      ? 'row'
-      : 'column';
+    shipContainer.style["flex-direction"] = currentShip.vertical
+      ? "row"
+      : "column";
     currentShip.changeDirection();
   }
 }

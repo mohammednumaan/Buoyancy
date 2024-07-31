@@ -1,5 +1,5 @@
-const Gameboard = require('../js/gameboard');
-const Ship = require('../js/ship');
+const Gameboard = require("../js/gameboard");
+const Ship = require("../js/ship");
 
 let gameBoard;
 let allShips;
@@ -18,13 +18,13 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-describe('Test: Valid coordinates for ship placement', () => {
-  test('Check if the ship coordinates are valid in the horizontal direction', () => {
+describe("Test: Valid coordinates for ship placement", () => {
+  test("Check if the ship coordinates are valid in the horizontal direction", () => {
     expect(gameBoard.isValidCoords(shipOne, 0, 0)).toBe(true);
     expect(gameBoard.isValidCoords(shipTwo, 0, 8)).toBe(false);
   });
 
-  test('Check if ships coordinates are valid in the vertical direction', () => {
+  test("Check if ships coordinates are valid in the vertical direction", () => {
     shipOne.changeDirection();
     shipTwo.changeDirection();
     expect(gameBoard.isValidCoords(shipOne, 0, 0)).toBe(true);
@@ -32,9 +32,9 @@ describe('Test: Valid coordinates for ship placement', () => {
   });
 });
 
-describe('Test: Placement of Ships on the Gameboard', () => {
-  test('Check if ship placement is valid in the horizontal direction', () => {
-    const isValidFunc = jest.spyOn(gameBoard, 'isValidCoords');
+describe("Test: Placement of Ships on the Gameboard", () => {
+  test("Check if ship placement is valid in the horizontal direction", () => {
+    const isValidFunc = jest.spyOn(gameBoard, "isValidCoords");
     expect(gameBoard.placeShip(shipOne, 0, 0)).toBe(true);
     expect(gameBoard.placeShip(shipTwo, 0, 8)).toBe(false);
 
@@ -42,14 +42,14 @@ describe('Test: Placement of Ships on the Gameboard', () => {
     expect(isValidFunc).toHaveBeenCalled();
   });
 
-  test('Check if ship placement is valid in the vertical direction', () => {
+  test("Check if ship placement is valid in the vertical direction", () => {
     shipOne.changeDirection();
     shipTwo.changeDirection();
     expect(gameBoard.placeShip(shipOne, 0, 0)).toBe(true);
     expect(gameBoard.placeShip(shipTwo, 8, 4)).toBe(false);
   });
 
-  test('Check if a ship attempting to overlap a ship is a valid placement', () => {
+  test("Check if a ship attempting to overlap a ship is a valid placement", () => {
     gameBoard.placeShip(shipOne, 0, 0);
     expect(gameBoard.placeShip(shipTwo, 0, 1)).toBe(false);
 
@@ -59,25 +59,25 @@ describe('Test: Placement of Ships on the Gameboard', () => {
   });
 });
 
-describe('Test: Attack Ships on the Gameboard', () => {
-  test('Check if ships recieve attack', () => {
-    const spyHitFunc = jest.spyOn(shipOne, 'hit');
+describe("Test: Attack Ships on the Gameboard", () => {
+  test("Check if ships recieve attack", () => {
+    const spyHitFunc = jest.spyOn(shipOne, "hit");
     gameBoard.placeShip(shipOne, 0, 0);
 
     expect(gameBoard.recieveAttack(0, 1)).toBe(true);
     expect(spyHitFunc).toHaveBeenCalled();
   });
 
-  test('Check whether the attack has missed.', () => {
-    const spyHitFunc = jest.spyOn(shipTwo, 'hit');
+  test("Check whether the attack has missed.", () => {
+    const spyHitFunc = jest.spyOn(shipTwo, "hit");
     gameBoard.placeShip(shipTwo, 5, 6);
     expect(gameBoard.recieveAttack(2, 3));
     expect(spyHitFunc).toHaveBeenCalledTimes(0);
   });
 });
 
-describe('Test: All ships are sunk', () => {
-  test('Return false if all ships are not sunk', () => {
+describe("Test: All ships are sunk", () => {
+  test("Return false if all ships are not sunk", () => {
     gameBoard.placeShip(shipOne, 0, 0);
     gameBoard.placeShip(shipTwo, 4, 0);
 
@@ -87,7 +87,7 @@ describe('Test: All ships are sunk', () => {
     expect(Gameboard.allShipSunk([shipOne, shipTwo])).toBe(false);
   });
 
-  test('Return true if all ships are sunk', () => {
+  test("Return true if all ships are sunk", () => {
     gameBoard.placeShip(shipOne, 0, 0);
     gameBoard.placeShip(shipTwo, 4, 0);
 

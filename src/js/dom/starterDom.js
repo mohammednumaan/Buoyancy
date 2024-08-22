@@ -1,6 +1,5 @@
 // imports
-import gameLogic from "../gameLogic";
-import domInterface from "./domInterface";
+import gameLogic from "../logic/gameLogic";
 
 const playerOneDiv = document.querySelector(".player-one");
 

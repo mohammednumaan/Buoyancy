@@ -1,7 +1,7 @@
 // imports
-import domInterface from "./dom/domInterface";
-import shipDomInterface from "./dom/shipDomInterface";
-import starterDOM from "./dom/starterDom";
+import domInterface from "../dom/domInterface";
+import shipDomInterface from "../dom/shipDomInterface";
+import starterDOM from "../dom/starterDom";
 import Gameboard from "./gameboard";
 
 const Player = require("./player");
@@ -41,7 +41,11 @@ async function handlePlayerTwoTurn(isAi, playerOne, playerTwo) {
 
     domInterface.renderBoards(playerOneContainer, playerTwoContainer);
   } else {
-    await shipDomInterface.attackShipAI(playerOne, playerOneContainer);
+    await shipDomInterface.attackShipAI(
+      playerTwo,
+      playerOne,
+      playerOneContainer,
+    );
   }
 
   playerTwo.changeTurn(playerOne);

@@ -1,10 +1,9 @@
-import Player from "../player";
+import Player from "../logic/player";
 import domInterface from "./domInterface";
 
-const Gameboard = require("../gameboard");
+const Gameboard = require("../logic/gameboard");
 
 export default class shipDomInterface {
-  static #generatedCoords = [[null, null]];
   static #adjacentCoords = [];
 
   // an async function that controls the flow of ship plcaement
@@ -39,11 +38,15 @@ export default class shipDomInterface {
       }
     }
 
+    // disable and remove the event listener to prevent
+    // side effects in a 2-player game and to prevent resetting
+    // after all ships ave been placed
     resetBtn.disabled = true;
     resetBtn.removeEventListener("click", resetHandler);
     return Promise.resolve("All Ships Placed!");
   }
 
+  // a simple method that marks a placed ship on the domboard
   static #markPlacedShip(domBoardClass, currentShip, x, y, isAi = false) {
     for (let i = 0; i < currentShip.length; i += 1) {
       const cell = !currentShip.vertical
@@ -57,6 +60,7 @@ export default class shipDomInterface {
     }
   }
 
+  // a simple method that marks an attacked or a missed ship on the domboard
   static #attackedShipClass(cell) {
     cell.classList.add(
       cell.classList.contains("placed-ship")
@@ -101,12 +105,10 @@ export default class shipDomInterface {
     }
   }
 
-
   /* eslint-disable consistent-return */
   // delegate AI's ship placement on its board by randomly generating
   // [x, y] tuples to place a ship
   static #delgateAIPlacement(currShip, enemyPlayer) {
-    
     const [x, y] = Player.trampolinedCoords(true);
     const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
 
@@ -128,16 +130,44 @@ export default class shipDomInterface {
 
   // a simple method that attacks the enemy player's (homePlayer)
   // board by generating random [x, y] tuples
-  static attackShipAI(enemyPlayer, enemyDomBoard) {
+  static attackShipAI(currentPlayer, enemyPlayer, enemyDomBoard) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const [x, y] = Player.trampolinedCoords(  );    
+
+        let [x, y] = [null, null];
+
+        if (Player.currentActiveHit.length) {
+          [x, y] = currentPlayer.generateAdjacentCoords(enemyPlayer);
+        } 
+        
+        else {
+          [x, y] = Player.trampolinedCoords();
+        }
         if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
           const cell = domInterface.getCellElement(
             x,
             y,
             enemyDomBoard.className,
           );
+          
+          if (!enemyPlayer.gameBoard.board[x][y]){
+            shipDomInterface.#attackedShipClass(cell);
+            return resolve();
+          }
+
+          if (
+            !Player.currentActiveHit.length &&
+            enemyPlayer.gameBoard.board[x][y]
+          ) {
+            Player.ship = enemyPlayer.gameBoard.board[x][y]
+            Player.currentActiveHit.push([x, y]);
+          } else{
+
+            Player.currentActiveHit.push([x, y]);
+            Player.succ = Player.currentActiveHit.length > 1 ? true : false;
+            currentPlayer.gameBoard.attackedCoords.push([x, y]);
+          }
+
           shipDomInterface.#attackedShipClass(cell);
           resolve();
         }
@@ -145,12 +175,7 @@ export default class shipDomInterface {
     });
   }
 
-  static #getAdjacentCoords(currentCoords) {
-    const [x, y] = currentCoords;
-    const isVertical = false;
-    if (y + 1 > 9 || y - 1 < 0) return;
-  }
-
+  // delegates drop events on the given domboard to place ships via drag and drop
   static async #delegateShipDrop(homePlayer, homeDomBoard) {
     // create an abort controller to handle removal of event listeners
     const abortController = new AbortController();
@@ -231,6 +256,7 @@ export default class shipDomInterface {
     homePlayer.gameBoard = new Gameboard();
   }
 
+  // a simple method that changess the ship direction for placement
   static changeDomShipDirection(currentShip, shipContainer) {
     shipContainer.style["flex-direction"] = currentShip.vertical
       ? "row"

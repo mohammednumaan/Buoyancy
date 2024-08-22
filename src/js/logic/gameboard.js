@@ -1,6 +1,5 @@
 class Gameboard {
   constructor() {
-    /* eslint-disable-next-line no-unused-vars */
     this.board = new Array(10).fill(null).map(() => new Array(10).fill(null));
     this.missedAttack = [];
     this.attackedCoords = [];
@@ -40,30 +39,31 @@ class Gameboard {
   }
 
   recieveAttack(x, y) {
-    let isSameCoord = false;
-    this.allAttackCoords.forEach((coord) => {
-      if (coord[0] === x && coord[1] === y) {
-        isSameCoord = true;
-      }
-    });
-
-    if (isSameCoord) return false;
+    const isDuplicatedCoord = this.isSameCoord(x, y)
+    if (isDuplicatedCoord) {
+      return false;
+    }
 
     if (!this.board[x][y]) {
       this.missedAttack.push([x, y]);
       this.allAttackCoords.push([x, y]);
       return true;
+    } else {
+      this.board[x][y].hit();
+      this.attackedCoords.push([x, y]);
+      this.allAttackCoords.push([x, y]);
+      return true;
     }
-
-    this.board[x][y].hit();
-    this.attackedCoords.push([x, y]);
-    this.allAttackCoords.push([x, y]);
-
-    return true;
   }
 
   static allShipSunk(shipArray) {
     return shipArray.every((ship) => ship.isSunk());
+  }
+
+  isSameCoord(x, y){
+    return this.allAttackCoords.some(
+      (coord) => coord[0] === x && coord[1] === y,
+    );
   }
 }
 

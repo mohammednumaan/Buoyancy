@@ -13,7 +13,7 @@ class Player {
     this.allShips = Ship.createShips();
     this.isAi = isAi;
     this.turn = turn;
-    this.aiAttackStatus = {choices: [] }
+    this.aiAttackStatus = {choices: [] , currentActiveHit: Player.currentActiveHit}
   }
 
   changeTurn(enemyPlayer) {
@@ -50,7 +50,7 @@ class Player {
   generateAdjacentCoords(humanPlayer) {
     if (!this.isAi) return;
 
-    if (this.aiAttackStatus.currentShip &&  this.aiAttackStatus.currentShip.isSunk()){
+    if (this.aiAttackStatus.hasOwnProperty('currentShip') && this.aiAttackStatus.currentShip.isSunk()){
       this.aiAttackStatus.choices = [];
       this.aiAttackStatus.currentShip = {}
       return Player.trampolinedCoords();
@@ -60,10 +60,10 @@ class Player {
     let arrayLength = Player.currentActiveHit.length - 1
     let currentHit = Player.currentActiveHit[arrayLength]
     let currentShip = humanPlayer.gameBoard.board[currentHit[0]][currentHit[1]]
-    console.log(currentShip)
     let adjCoord;
 
     if (arrayLength === 1) this.aiAttackStatus.currentShip = currentShip;
+
 
     const [x, y] = currentHit;
     let choices = [
@@ -85,8 +85,10 @@ class Player {
 
 
     let randomChoice = Math.floor(Math.random() * this.aiAttackStatus.choices.length);
-    delete this.aiAttackStatus.choices[randomChoice]
-    adjCoord = choices[randomChoice];
+    let attack = humanPlayer.gameBoard.board
+    adjCoord = this.aiAttackStatus.choices[randomChoice];
+    this.aiAttackStatus.choices.splice(randomChoice, 1)
+
 
         
     if (Player.succ) {
@@ -94,19 +96,34 @@ class Player {
       let yCoordDifference = currentHit[1] - Player.currentActiveHit[arrayLength - 1][1];
 
       if (xCoordDifference === 1) {
-        adjCoord = [x + 1, y];
       }
       if (xCoordDifference === - 1) {
         adjCoord = [x - 1, y];
       }
       if (yCoordDifference === 1) {
-        adjCoord = [x, y + 1];
+
+        if (!attack[x][y + 1]){
+          adjCoord = [Player.currentActiveHit[0][0], Player.currentActiveHit[0][1] - 1]
+        } else{
+
+          adjCoord = [x, y + 1];
+        }
       }
       if (yCoordDifference === - 1) {
-        adjCoord = [x, y - 1];
-      }
+        if (!attack[x][y - 1]){
+          adjCoord = [Player.currentActiveHit[0][0], Player.currentActiveHit[0][1] + 1]
+        } else{
+
+          adjCoord = [x, y - 1];
+        }
+        }
+
+      console.log('inner', adjCoord, this)
       return adjCoord;
     }
+
+    console.log('outer', adjCoord, this)
+
 
     return adjCoord;
   }

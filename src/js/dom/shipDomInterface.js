@@ -154,6 +154,7 @@ export default class shipDomInterface {
             shipDomInterface.#attackedShipClass(cell);
             return resolve();
           }
+          console.log(Player.currentActiveHit)
 
           if (
             !Player.currentActiveHit.length &&

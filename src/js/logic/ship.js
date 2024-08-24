@@ -1,5 +1,8 @@
+const { v4: uuidv4 } = require('uuid');
+
 class Ship {
   constructor(length) {
+    this.id = uuidv4();
     this.length = length;
     this.hits = 0;
     this.vertical = false;

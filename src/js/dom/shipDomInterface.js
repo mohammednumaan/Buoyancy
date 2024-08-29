@@ -134,15 +134,12 @@ export default class shipDomInterface {
     return new Promise((resolve) => {
       setTimeout(() => {
 
-        let [x, y] = [null, null];
+        let [x, y] = (Player.currentActiveHit.length) ? currentPlayer.generateAdjacentCoords(enemyPlayer)
+               : Player.trampolinedCoords()
 
-        if (Player.currentActiveHit.length) {
-          [x, y] = currentPlayer.generateAdjacentCoords(enemyPlayer);
-        } 
-        
-        else {
-          [x, y] = Player.trampolinedCoords();
-        }
+        console.log([x, y])
+
+
         if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
           const cell = domInterface.getCellElement(
             x,
@@ -151,22 +148,25 @@ export default class shipDomInterface {
           );
           
           if (!enemyPlayer.gameBoard.board[x][y]){
+            currentPlayer.aiAttackStatus.recentHit = [x, y]
             shipDomInterface.#attackedShipClass(cell);
             return resolve();
           }
-          console.log(Player.currentActiveHit)
 
           if (
             !Player.currentActiveHit.length &&
             enemyPlayer.gameBoard.board[x][y]
           ) {
-            Player.ship = enemyPlayer.gameBoard.board[x][y]
+            currentPlayer.aiAttackStatus.currentShip = enemyPlayer.gameBoard.board[x][y]
+            currentPlayer.aiAttackStatus.recentHit = [x, y] 
             Player.currentActiveHit.push([x, y]);
+
+            
           } else{
 
             Player.currentActiveHit.push([x, y]);
-            Player.succ = Player.currentActiveHit.length > 1 ? true : false;
-            currentPlayer.gameBoard.attackedCoords.push([x, y]);
+            currentPlayer.aiAttackStatus.recentHit = [x, y]
+            currentPlayer.aiAttackStatus.secondHit = Player.currentActiveHit.length > 1 ? true : false;
           }
 
           shipDomInterface.#attackedShipClass(cell);

@@ -1,4 +1,4 @@
-import Player from "../logic/player";
+import Player, { AiPlayer } from "../logic/player";
 import domInterface from "./domInterface";
 
 const Gameboard = require("../logic/gameboard");
@@ -24,7 +24,7 @@ export default class shipDomInterface {
     // event listener to handle ship placement reset
     resetBtn.addEventListener("click", resetHandler);
 
-    // wait until all ships are placed
+    // loop until all ships are placed
     while (!isAllPlaced) {
       resetBtn.disabled = !(
         Array.from(dashboardContainer.children).slice(1).length < 5
@@ -40,7 +40,7 @@ export default class shipDomInterface {
 
     // disable and remove the event listener to prevent
     // side effects in a 2-player game and to prevent resetting
-    // after all ships ave been placed
+    // after all ships have been placed
     resetBtn.disabled = true;
     resetBtn.removeEventListener("click", resetHandler);
     return Promise.resolve("All Ships Placed!");
@@ -109,7 +109,7 @@ export default class shipDomInterface {
   // delegate AI's ship placement on its board by randomly generating
   // [x, y] tuples to place a ship
   static #delgateAIPlacement(currShip, enemyPlayer) {
-    const [x, y] = Player.trampolinedCoords(true);
+    const [x, y] = Player.Player.trampolinedCoords(true);
     const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
 
     if (directionChoice) currShip.changeDirection();
@@ -130,45 +130,36 @@ export default class shipDomInterface {
 
   // a simple method that attacks the enemy player's (homePlayer)
   // board by generating random [x, y] tuples
-  static attackShipAI(currentPlayer, enemyPlayer, enemyDomBoard) {
+  static attackShipAI(aiPlayer, enemyPlayer, enemyDomBoard) {
     return new Promise((resolve) => {
       setTimeout(() => {
 
-        let [x, y] = (Player.currentActiveHit.length) ? currentPlayer.generateAdjacentCoords(enemyPlayer)
-               : Player.trampolinedCoords()
+        let coords = (aiPlayer.currentActiveHit.length !== 0) ? aiPlayer.generateAdjacentCoords(enemyPlayer) : Player.Player.trampolinedCoords();
 
-        console.log([x, y])
+        console.log('Gen Coords: ', coords);
+        let [x, y] = coords;
+        
 
 
         if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
-          const cell = domInterface.getCellElement(
-            x,
-            y,
-            enemyDomBoard.className,
-          );
-          
-          if (!enemyPlayer.gameBoard.board[x][y]){
-            currentPlayer.aiAttackStatus.recentHit = [x, y]
-            shipDomInterface.#attackedShipClass(cell);
-            return resolve();
+          const isShip = enemyPlayer.gameBoard.board[x][y];
+          const cell = domInterface.getCellElement(x, y,  enemyDomBoard.className);
+
+          if (!aiPlayer.currentActiveHit.length && isShip){
+            aiPlayer.currentActiveHit.push([x, y])
+            aiPlayer.aiAttackStatus.currShip = isShip;
           }
 
-          if (
-            !Player.currentActiveHit.length &&
-            enemyPlayer.gameBoard.board[x][y]
-          ) {
-            currentPlayer.aiAttackStatus.currentShip = enemyPlayer.gameBoard.board[x][y]
-            currentPlayer.aiAttackStatus.recentHit = [x, y] 
-            Player.currentActiveHit.push([x, y]);
-
-            
-          } else{
-
-            Player.currentActiveHit.push([x, y]);
-            currentPlayer.aiAttackStatus.recentHit = [x, y]
-            currentPlayer.aiAttackStatus.secondHit = Player.currentActiveHit.length > 1 ? true : false;
+          else if (aiPlayer.currentActiveHit.length === 1 && isShip){
+            aiPlayer.secondHit = true;
+            aiPlayer.currentActiveHit.push([x, y])
           }
 
+          else if (aiPlayer.currentActiveHit.length > 1 && isShip){
+            aiPlayer.currentActiveHit.push([x, y])
+          }
+
+          aiPlayer.aiAttackStatus.recentHit = [x, y];
           shipDomInterface.#attackedShipClass(cell);
           resolve();
         }

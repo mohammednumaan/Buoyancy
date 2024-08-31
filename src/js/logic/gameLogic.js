@@ -119,11 +119,11 @@ function openGameOverModal(winner, isAi) {
   );
 }
 
-// an async function controls the main game flow
+// an async function that controls the main game flow
 export default async function gameLogic(isAi) {
   // intialize players and game status
-  const playerOne = new Player(true, false);
-  const playerTwo = new Player(false, isAi);
+  const playerOne = new Player.Player(true, false);
+  const playerTwo = new Player.AiPlayer(false, true);
   const gameStatus = { gameover: false, turns: 1 };
 
   // initialize playerOne's boards and wait for ship placement
@@ -161,7 +161,6 @@ export default async function gameLogic(isAi) {
     );
     domInterface.createBoards(playerTwoContainer);
     shipDomInterface.placeAIShips(playerTwo);
-    console.log(playerTwo);
 
     playerTwoDiv.style.display = "block";
     dashboard.style.display = "none";

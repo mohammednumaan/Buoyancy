@@ -36,123 +36,199 @@ class Player {
         return coordsArr;
       }
     });
-
+    
+    // if the generated coords are for ship placement, do not push
+    // them into the generated coords array to avoid **ignoring**
+    // the coords during attack
     if (!forPlacement) {
       Player.#generatedCoords.push(coordsArr);
     }
     return coordsArr;
-    // if the generated coords are for ship placement, do not push
-    // them into the generated coords array to avoid **ignoring**
-    // the coords during attack
   }
 
-  generateAdjacentCoords(humanPlayer) {
-    if (!this.isAi) return;
-
-    
-    if (this.aiAttackStatus.hasOwnProperty('currentShip') && this.aiAttackStatus.currentShip.isSunk()){
-      this.aiAttackStatus.choices = [];
-      delete this.aiAttackStatus.currentShip
-      this.aiAttackStatus.secondHit = false
-      Player.currentActiveHit = []
-      return Player.trampolinedCoords();
-    }
-
-
-    // retrieve AI's current hit, the ship it's attacking
-    let arrayLength = Player.currentActiveHit.length - 1
-    let currentHit = Player.currentActiveHit[arrayLength]
-
-    let humanPlayerBoard = humanPlayer.gameBoard.board
-    let adjCoord = [];
-
-    this.aiAttackStatus.choices
-
-    const [x, y] = currentHit;
-
-      // retrieve the latest ship hit and check for invalid choices
-      // if (x + 1 > 9 || x - 1 < 0) return this.generateAdjacentCoords(humanPlayer);
-      // if (y + 1 > 9 || y - 1 < 0) return this.generateAdjacentCoords(humanPlayer);
-      // if (x + 1 > 9) return [x - 1, y]
-      
-    let choices = [
-      [x + 1, y],
-      [x - 1, y],
-      [x, y + 1],
-      [x, y - 1],
-    ];
-
-    if (!this.aiAttackStatus.choices.length){
-      for (let i = 0; i < choices.length; i++){
-        
-        // if (this.aiAttackStatus.choices.some((coord) => coord[0] === choices[0] && coord[1] === choices[1])) 
-        this.aiAttackStatus.choices.push(choices[i])
-        
-      }
-    }
-    
-    this.aiAttackStatus.choices.forEach((choices, idx) => {
-
-      if (humanPlayer.gameBoard.allAttackCoords.some((coord) => coord[0] === choices[0] && coord[1] === choices[1])){
-        this.aiAttackStatus.choices.splice(idx, 1);  
-      }
-    })
-
-        // if (this.aiAttackStatus.choices.length && this.aiAttackStatus.choices.some((coord) => coord[0] == choice[0] && coord[1] == choice[1])){
-        //   this.aiAttackStatus.choices.splice(idx, 1);
-        //   return
-        // }
-    
-
-    if (this.aiAttackStatus.secondHit) {
-      let xCoordDifference = currentHit[0] - Player.currentActiveHit[arrayLength - 1][0];
-      let yCoordDifference = currentHit[1] - Player.currentActiveHit[arrayLength - 1][1];
-      let status = this.aiAttackStatus.recentHit
-      let active = Player.currentActiveHit
-
-
-      let isValid = status[0] === active[arrayLength][0] && status[1] === active[arrayLength][1]
-      if (xCoordDifference === 1) {
-        adjCoord = (!isValid) ? [Player.currentActiveHit[0][0] - 1, Player.currentActiveHit[0][1]] 
-                 : [x + 1, y];
-
-        console.log('1x', adjCoord)
-      }
-      
-      if (xCoordDifference === -1) {
-        adjCoord = (!isValid) ? [Player.currentActiveHit[0][0] + 1, Player.currentActiveHit[0][1]] 
-                 : [x - 1, y];
-        console.log('-1x', adjCoord)
-        
-      }
-
-      if (yCoordDifference === 1) {
-        adjCoord = (!isValid) ? [Player.currentActiveHit[0][0], Player.currentActiveHit[0][1] - 1] 
-                 : [x, y + 1];
-                 console.log('1y', adjCoord)
-        
-      }
-
-      if (yCoordDifference === -1) {
-        adjCoord = (!isValid) ? [Player.currentActiveHit[0][0], Player.currentActiveHit[0][1] + 1] 
-                 : [x, y - 1];
-                 console.log('-1y', adjCoord)
-
-      }
-
-      return adjCoord;
-    }
-
-
-    let randomChoice = Math.floor(Math.random() * this.aiAttackStatus.choices.length);
-    adjCoord = this.aiAttackStatus.choices[randomChoice];
-    return adjCoord;
-  }
-
+  
   static trampolinedCoords(forPlacement = false) {
     const trampolinedFunc = trampoline(Player.#generateRandomCoords);
     return trampolinedFunc(forPlacement);
   }
 }
 
-module.exports = Player;
+class AiPlayer extends Player{
+
+  constructor(turn , isAi){
+    super(turn, isAi);
+    this.currentActiveHit = []
+    this.secondHit = false
+    this.aiAttackStatus = {choices: [], recentHit:[], shipQueue: [], currShip: {}};
+  }
+
+  generateAdjacentCoords(humanPlayer){
+
+    // initialze and retrieve information about the current active hit
+    let coords = [];
+    let [x, y] = this.currentActiveHit[this.currentActiveHit.length - 1];    
+    let currentShip = this.aiAttackStatus.currShip;
+    
+    if (currentShip && currentShip.isSunk()){
+      this.aiAttackStatus = {choices: [], recentHit:[], shipQueue: [], currShip: {}}
+      this.currentActiveHit = [];
+      this.secondHit = false;
+      return Player.trampolinedCoords();
+    }
+
+    if (this.secondHit){
+      let xDiff = x - this.currentActiveHit[this.currentActiveHit.length - 2][0]  
+      let yDiff = y - this.currentActiveHit[this.currentActiveHit.length - 2][1]
+      let isIncompleteAttack = this.aiAttackStatus.recentHit[0] === x && this.aiAttackStatus.recentHit[1] === y;
+
+      // CASE 1: initial hit is on the edge of the ships.
+      // so, determine the difference and move in that direction
+      if ((xDiff === -1 || xDiff === 1) && isIncompleteAttack){
+        switch(xDiff){
+          case 1:
+            coords = [x + 1, y]
+            break;
+
+          case -1:
+            coords = [x - 1, y]
+            break;
+        }
+
+        return coords;
+      }
+
+      else if ((yDiff === -1 || yDiff === 1) && isIncompleteAttack){
+        switch(yDiff){
+          case 1:
+            coords = [x, y + 1];
+            break;
+
+          case -1:
+            coords = [x, y - 1];
+            break;
+        }
+
+        return coords;
+      }
+
+      // CASE 2: initial hit is not on the ends of the ship.
+      // so, determine the previous succesfull attack and use that to 
+      // compute the direction of hit
+      else{
+
+
+        let xDiff = this.currentActiveHit[0][0] - this.currentActiveHit[1][0]
+        let yDiff = this.currentActiveHit[0][1] - this.currentActiveHit[1][1]
+        console.log('in', xDiff, yDiff, isIncompleteAttack, this.currentActiveHit)
+        console.log(this.aiAttackStatus);
+
+
+        if (!isIncompleteAttack){
+          let initialPoint = this.currentActiveHit[0];
+
+          if (xDiff){
+            switch(xDiff){
+              case 1:
+                // if the diff is 1, shift the attack to the opposite side 
+                coords = [initialPoint[0] + 1, initialPoint[1]]
+                break;
+            
+              case -1:
+                // if the diff is -1, shift the attack to the opposite side
+                coords = [initialPoint[0] - 1, initialPoint[1]]
+                break
+            }
+          }
+
+          else if (yDiff){
+            console.log(yDiff, initialPoint)
+            switch(yDiff){
+              
+        
+              case 1:
+                // if the diff is 1, shift the attack to the opposite side 
+                coords = [initialPoint[0], initialPoint[1] + 1]
+                break;
+            
+              case -1:
+                // if the diff is -1, shift the attack to the opposite side
+                coords = [initialPoint[0], initialPoint[1] - 1]
+                break
+            }
+          }
+          console.log(coords)
+          return coords;
+        } 
+        
+        else{
+
+          let currentHit = this.currentActiveHit[this.currentActiveHit.length - 1]
+          if (xDiff){
+            switch(xDiff){
+              case 1:
+                // if the diff is 1, shift the attack to the opposite side 
+                coords = [currentHit[0] + 1, currentHit[1]]
+                break;
+            
+              case -1:
+                // if the diff is -1, shift the attack to the opposite side
+                coords = [currentHit[0] - 1, currentHit[1]]
+                break
+            }
+          }
+
+          else if (yDiff){
+            switch(yDiff){
+              
+              case 1:
+                // if the diff is 1, shift the attack to the opposite side 
+                coords = [currentHit[0], currentHit[1] + 1]
+                break;
+            
+              case -1:
+                // if the diff is -1, shift the attack to the opposite side
+                coords = [currentHit[0], currentHit[1] - 1]
+                break
+            }
+          }
+
+          return coords;
+        }
+      }
+    }
+
+    else{
+
+      // generate all possible adjacent coords for the current hit
+      let choices = [
+        [x + 1, y],
+        [x - 1, y],
+        [x, y + 1],
+        [x, y - 1],
+      ];
+
+      // on the initial hit, push the possible choices that the bot can pick to attack
+      if (!this.aiAttackStatus.choices.length){
+        choices.forEach(choice => {
+          this.aiAttackStatus.choices.push(choice);
+        })
+      }
+
+      // checks if the choice is already been used, if true, remove it from the choice array
+      this.aiAttackStatus.choices.forEach((choice, idx) => {
+        let isSameCoord = humanPlayer.gameBoard.isSameCoord(choice[0], choice[1]);
+        if (isSameCoord) this.aiAttackStatus.choices.splice(idx, 1);
+      })
+
+      let randomIdx = Math.floor(Math.random() * this.aiAttackStatus.choices.length);
+      coords = this.aiAttackStatus.choices[randomIdx];
+      return coords;
+
+
+    }
+
+  }
+
+}
+
+module.exports = { Player, AiPlayer };

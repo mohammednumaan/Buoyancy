@@ -138,6 +138,7 @@ export default class shipDomInterface {
 
         console.log('Gen Coords: ', coords);
         let [x, y] = coords;
+        Player.Player.generatedCoords.push([x, y])
         
 
 

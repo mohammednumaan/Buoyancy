@@ -1,36 +1,35 @@
-export default function generateShipHitCoord(xDiff, yDiff, initialPoint, humanPlayer){
+export default function generateShipHitCoord(xDiff, yDiff, xCoord = null, yCoord = null, humanPlayer){
     let coords = [];
     if (xDiff){
         switch(xDiff){
           case 1:
             // if the diff is 1, shift the attack to the opposite side 
-            
-            coords = [initialPoint[0] + 1, initialPoint[1]]
+            coords = [xCoord + 1, yCoord]
             break;
         
           case -1:
             // if the diff is -1, shift the attack to the opposite side
-            coords = [initialPoint[0] - 1, initialPoint[1]]
+            coords = [xCoord - 1, yCoord]
             break
         }
       }
 
       else if (yDiff){
-        console.log(yDiff, initialPoint)
+        console.log('in', yDiff, xCoord)
         switch(yDiff){
           
     
           case 1:
             // if the diff is 1, shift the attack to the opposite side 
-            coords = [initialPoint[0], initialPoint[1] + 1]
+            coords = [xCoord, yCoord + 1]
             break;
         
           case -1:
             // if the diff is -1, shift the attack to the opposite side
-            coords = [initialPoint[0], initialPoint[1] - 1]
+            coords = [xCoord, yCoord - 1]
             break
         }
       }
-      console.log(coords)
+      
       return coords;
 }

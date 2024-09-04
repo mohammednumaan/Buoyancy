@@ -137,8 +137,8 @@ export default class shipDomInterface {
         let coords = (aiPlayer.currentActiveHit.length !== 0) ? aiPlayer.generateAdjacentCoords(enemyPlayer) : Player.Player.trampolinedCoords();
 
         console.log('Gen Coords: ', coords);
+        Player.Player.generatedCoords.push(coords)
         let [x, y] = coords;
-        Player.Player.generatedCoords.push([x, y])
         
 
 
@@ -152,15 +152,25 @@ export default class shipDomInterface {
           }
 
           else if (aiPlayer.currentActiveHit.length === 1 && isShip){
-            aiPlayer.secondHit = true;
-            aiPlayer.currentActiveHit.push([x, y])
+            if (isShip.id === aiPlayer.aiAttackStatus.currShip.id){
+              aiPlayer.secondHit = true;
+              aiPlayer.currentActiveHit.push([x, y])
+              aiPlayer.aiAttackStatus.shipQueue.push(isShip);
+            }
+
           }
 
           else if (aiPlayer.currentActiveHit.length > 1 && isShip){
-            aiPlayer.currentActiveHit.push([x, y])
+            if (isShip.id !== aiPlayer.aiAttackStatus.currShip.id){
+              aiPlayer.aiAttackStatus.shipQueue.push(isShip);
+            }
+            else{
+              aiPlayer.currentActiveHit.push([x, y])
+            }
           }
 
           aiPlayer.aiAttackStatus.recentHit = [x, y];
+          console.log('enddd')
           shipDomInterface.#attackedShipClass(cell);
           resolve();
         }

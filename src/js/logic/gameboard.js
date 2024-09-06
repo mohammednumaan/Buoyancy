@@ -1,8 +1,7 @@
 class Gameboard {
   constructor() {
     this.board = new Array(10).fill(null).map(() => new Array(10).fill(null));
-    this.missedAttack = [];
-    this.attackedCoords = [];
+    this.boardClone = structuredClone(this.board)
     this.allAttackCoords = [];
   }
 
@@ -45,15 +44,15 @@ class Gameboard {
     }
 
     if (!this.board[x][y]) {
-      this.missedAttack.push([x, y]);
-      this.allAttackCoords.push([x, y]);
-      return true;
+      this.boardClone[x][y] = false;
+      
     } else {
       this.board[x][y].hit();
-      this.attackedCoords.push([x, y]);
-      this.allAttackCoords.push([x, y]);
-      return true;
+      this.boardClone[x][y] = true;      
     }
+
+    this.allAttackCoords.push([x, y])
+    return true;
   }
 
   static allShipSunk(shipArray) {

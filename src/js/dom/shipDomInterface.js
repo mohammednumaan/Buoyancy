@@ -108,23 +108,23 @@ export default class shipDomInterface {
   /* eslint-disable consistent-return */
   // delegate AI's ship placement on its board by randomly generating
   // [x, y] tuples to place a ship
-  static #delgateAIPlacement(currShip, enemyPlayer) {
-    const [x, y] = Player.Player.trampolinedCoords(true);
+  static #delgateAIPlacement(currShip, aiPlayer) {
+    const [x, y] = Player.Player.generateRandomCoords(aiPlayer);
     const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
 
     if (directionChoice) currShip.changeDirection();
 
-    if (!enemyPlayer.gameBoard.isValidCoords(currShip, x, y)) {
-      return shipDomInterface.#delgateAIPlacement(currShip, enemyPlayer);
+    if (!aiPlayer.gameBoard.isValidCoords(currShip, x, y)) {
+      return shipDomInterface.#delgateAIPlacement(currShip, aiPlayer);
     }
-    enemyPlayer.gameBoard.placeShip(currShip, x, y);
+    aiPlayer.gameBoard.placeShip(currShip, x, y);
     shipDomInterface.#markPlacedShip("player-two-board", currShip, x, y, true);
   }
 
   // a simple method that places all AI's ships
-  static placeAIShips(enemyPlayer) {
-    enemyPlayer.allShips.forEach((ship) =>
-      shipDomInterface.#delgateAIPlacement(ship, enemyPlayer),
+  static placeAIShips(aiPlayer) {
+    aiPlayer.allShips.forEach((ship) =>
+      shipDomInterface.#delgateAIPlacement(ship, aiPlayer),
     );
   }
 
@@ -134,14 +134,9 @@ export default class shipDomInterface {
     return new Promise((resolve) => {
       setTimeout(() => {
 
-        let coords = (aiPlayer.currentActiveHit.length !== 0) ? aiPlayer.generateAdjacentCoords(enemyPlayer) : Player.Player.trampolinedCoords();
+        let coords = (aiPlayer.currentActiveHit.length !== 0) ? aiPlayer.generateAdjacentCoords(enemyPlayer) : Player.Player.generateRandomCoords(enemyPlayer);
 
-        console.log('Gen Coords: ', coords);
-        Player.Player.generatedCoords.push(coords)
         let [x, y] = coords;
-        
-
-
         if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
           const isShip = enemyPlayer.gameBoard.board[x][y];
           const cell = domInterface.getCellElement(x, y,  enemyDomBoard.className);
@@ -155,22 +150,17 @@ export default class shipDomInterface {
             if (isShip.id === aiPlayer.aiAttackStatus.currShip.id){
               aiPlayer.secondHit = true;
               aiPlayer.currentActiveHit.push([x, y])
-              aiPlayer.aiAttackStatus.shipQueue.push(isShip);
             }
 
           }
 
           else if (aiPlayer.currentActiveHit.length > 1 && isShip){
-            if (isShip.id !== aiPlayer.aiAttackStatus.currShip.id){
-              aiPlayer.aiAttackStatus.shipQueue.push(isShip);
-            }
-            else{
+            if (isShip.id === aiPlayer.aiAttackStatus.currShip.id){
               aiPlayer.currentActiveHit.push([x, y])
             }
           }
 
           aiPlayer.aiAttackStatus.recentHit = [x, y];
-          console.log('enddd')
           shipDomInterface.#attackedShipClass(cell);
           resolve();
         }

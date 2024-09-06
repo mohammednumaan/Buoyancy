@@ -2,6 +2,7 @@ const Gameboard = require("./gameboard");
 const Ship = require("./ship");
 const { default: trampoline } = require("../utils/trampoline");
 const { default: generateShipHitCoord } = require("../utils/adjacentCoords");
+const { default: handleSameCoords } = require("../utils/handleSameCoords");
 
 class Player {
   static generatedCoords = [[null, null]];
@@ -13,7 +14,6 @@ class Player {
     this.allShips = Ship.createShips();
     this.isAi = isAi;
     this.turn = turn;
-    this.aiAttackStatus = {choices: [] , currentActiveHit: Player.currentActiveHit, secondHit: false, recentHit:[]}
   }
 
   changeTurn(enemyPlayer) {
@@ -23,35 +23,18 @@ class Player {
 
   // a simple method that generates unique and random [x, y] tuples
   // for the AI to attack and place ships on its board
-  static #generateRandomCoords(forPlacement) {
-    let coordsArr = [
-      Math.floor(Math.random() * 10),
-      Math.floor(Math.random() * 10),
-    ];
-
-    // if the generatedCoords array includes the newly created [x, y] tuple,
-    // return a callback of this function which will be called later (trampolining recursion)
-    Player.generatedCoords.forEach((coord) => {
-      if (coord[0] === coordsArr[0] && coord[1] === coordsArr[1]) {
-        coordsArr = () => Player.#generateRandomCoords(forPlacement);
-        return coordsArr;
-      }
-    });
-    
-    // if the generated coords are for ship placement, do not push
-    // them into the generated coords array to avoid **ignoring**
-    // the coords during attack
-    if (!forPlacement && typeof coordsArr !== "function") {
-      Player.generatedCoords.push(coordsArr);
-    }
-    return coordsArr;
+  static generateRandomCoords(humanPlayer) {
+    const nullCoords = []
+    humanPlayer.gameBoard.boardClone.forEach((xCoord, xIdx) => {
+      xCoord.forEach((yCoord, yIdx) => {
+        if (yCoord === null) nullCoords.push([xIdx, yIdx]);
+      })
+    })
+    const randomIdx = Math.floor(Math.random() * nullCoords.length);
+    return nullCoords[randomIdx];
   }
 
-  
-  static trampolinedCoords(forPlacement = false) {
-    const trampolinedFunc = trampoline(Player.#generateRandomCoords);
-    return trampolinedFunc(forPlacement);
-  }
+
 }
 
 class AiPlayer extends Player{
@@ -60,7 +43,7 @@ class AiPlayer extends Player{
     super(turn, isAi);
     this.currentActiveHit = []
     this.secondHit = false
-    this.aiAttackStatus = {choices: [], recentHit:[], shipQueue: [], currShip: {}};
+    this.aiAttackStatus = {choices: [], recentHit:[], hitQueue: [], currShip: {}};
   }
 
   
@@ -73,19 +56,17 @@ class AiPlayer extends Player{
     let currentShip = this.aiAttackStatus.currShip;
     
     if (currentShip && currentShip.isSunk()){
-      this.aiAttackStatus = {choices: [], recentHit:[], shipQueue: [], currShip: {}}
+      this.aiAttackStatus = {choices: [], recentHit:[], hitQueue: [], currShip: {}}
       this.currentActiveHit = [];
       this.secondHit = false;
-      return Player.trampolinedCoords();
+      return Player.generateRandomCoords(humanPlayer);
     }
 
+    // checks if the choice is already been used, if true, remove it from the choice array
     if (this.aiAttackStatus.choices.length){
-        // checks if the choice is already been used, if true, remove it from the choice array
         this.aiAttackStatus.choices.forEach((choice, idx) => {
-          let isSameCoord = humanPlayer.gameBoard.isSameCoord(choice[0], choice[1]);
-          console.log('hi',Player.generatedCoords)
-          let isSameGen = Player.generatedCoords.some((coord) => coord[0] === choice[0] && coord[1] === choice[1])
-          if (isSameGen) this.aiAttackStatus.choices.splice(idx, 1);
+          let isSameCoord = humanPlayer.gameBoard.boardClone[choice[0]][choice[1]] !== null
+          if (isSameCoord) this.aiAttackStatus.choices.splice(idx, 1);
         })
     }
 
@@ -93,15 +74,13 @@ class AiPlayer extends Player{
       let xDiff = x - this.currentActiveHit[this.currentActiveHit.length - 2][0]  
       let yDiff = y - this.currentActiveHit[this.currentActiveHit.length - 2][1]
       let isIncompleteAttack = this.aiAttackStatus.recentHit[0] === x && this.aiAttackStatus.recentHit[1] === y;
-      console.log(x, y, isIncompleteAttack, 'incom')
       let isInvalid;
       if (xDiff){
-        isInvalid = (x - 1 < 0 || x + 1 > 9);
+        isInvalid = (x - 1 < 0 || x + 1 > 9) ;
       } 
       else{
         isInvalid = (y - 1 < 0 || y + 1 > 9);
       }
-      console.log(isInvalid)
 
       // CASE 1: initial hit is on the edge of the ships.
       // so, determine the difference and move in that direction
@@ -110,10 +89,37 @@ class AiPlayer extends Player{
           case 1:
             
             coords = [x + 1, y]
+            if (humanPlayer.gameBoard.boardClone[coords[0]][coords[1]] === true){
+              coords = [x + 2, y]
+              if (x + 2 > 9){
+                let func = handleSameCoords.bind(this)
+                coords = func(humanPlayer)
+
+              }
+              break
+            }
+            if (humanPlayer.gameBoard.isSameCoord(coords[0], coords[1])){
+              let func = handleSameCoords.bind(this)
+              coords = func(humanPlayer)
+            }
             break;
 
           case -1:
             coords = [x - 1, y]
+            if (humanPlayer.gameBoard.boardClone[coords[0]][coords[1]] === true){
+              coords = [x - 2, y]
+              if (x - 2 < 0){
+                let func = handleSameCoords.bind(this)
+                coords = func(humanPlayer)
+
+              }
+              break
+            }
+            if (humanPlayer.gameBoard.isSameCoord(coords[0], coords[1])){
+              let func = handleSameCoords.bind(this)
+              coords = func(humanPlayer)
+
+            }
             break;
         }
 
@@ -124,12 +130,39 @@ class AiPlayer extends Player{
         switch(yDiff){
           case 1:
             coords = [x, y + 1];
+            if (humanPlayer.gameBoard.boardClone[coords[0]][coords[1]] === true){
+              coords = [x, y + 2]
+              if (y + 2 > 9){
+                let func = handleSameCoords.bind(this)
+                coords = func(humanPlayer)
+
+              }
+              break
+            }
+            if (humanPlayer.gameBoard.isSameCoord(coords[0], coords[1])){
+              let func = handleSameCoords.bind(this)
+              coords = func(humanPlayer)
+
+            }
+
             break;
 
           case -1:
             coords = [x, y - 1];
-            console.log('y - 1=', y - 1)
+            if (humanPlayer.gameBoard.boardClone[coords[0]][coords[1]] === true){
+              coords = [x, y - 2]
+              if (y - 2 < 0){
+                let func = handleSameCoords.bind(this)
+                coords = func(humanPlayer)
 
+              }
+              break
+            }
+            if (humanPlayer.gameBoard.isSameCoord(coords[0], coords[1])){
+              let func = handleSameCoords.bind(this)
+              coords = func(humanPlayer)
+
+            }
             break;
         }
 
@@ -144,11 +177,9 @@ class AiPlayer extends Player{
 
         let xDiff = this.currentActiveHit[0][0] - this.currentActiveHit[1][0]
         let yDiff = this.currentActiveHit[0][1] - this.currentActiveHit[1][1]
-        console.log(isInvalid, [xDiff, yDiff]);
 
 
         if (!isIncompleteAttack || isInvalid){
-          console.log('YYYY')
           let initialPoint = this.currentActiveHit[0];
           coords = generateShipHitCoord(xDiff, yDiff, initialPoint[0], initialPoint[1], humanPlayer);
         }
@@ -186,23 +217,45 @@ class AiPlayer extends Player{
             return;
           }
 
+          if (humanPlayer.gameBoard.boardClone[choice[0]][choice[1]] !== null){
+            return
+          }
+
           this.aiAttackStatus.choices.push(choice);
         })
       }
 
-        // checks if the choice is already been used, if true, remove it from the choice array
-        this.aiAttackStatus.choices.forEach((choice, idx) => {
-          let isSameGen = Player.generatedCoords.some((coord) => coord[0] === choice[0] && coord[1] === choice[1])
-          if (isSameGen) this.aiAttackStatus.choices.splice(idx, 1);
+      // checks if the choice is already been used, if true, remove it from the choice array
+      if (!this.aiAttackStatus.choices.length){
+        let choices = [
+          [x + 2, y],
+          [x - 2, y],
+          [x, y + 2],
+          [x, y - 2],
+        ];
+
+        choices.forEach(choice => {
+          if (choice[0] === -1 || choice[1] === -1){
+            return;
+          }
+
+          if (choice[0] > 9 || choice[1] > 9){
+            return;
+          }
+
+          if (humanPlayer.gameBoard.boardClone[choice[0]][choice[1]] !== null){
+            return
+          }
+
+          this.aiAttackStatus.choices.push(choice);
         })
+      }
 
       // generate a random index, and use it to select the adjacent coords from 
       // the generated valid adjacent choices
       let randomIdx = Math.floor(Math.random() * this.aiAttackStatus.choices.length);
       coords = this.aiAttackStatus.choices[randomIdx];
       return coords;
-
-
     }
   }
 

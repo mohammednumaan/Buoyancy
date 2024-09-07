@@ -1,7 +1,7 @@
 const Player = require("../js/logic/player");
 
-const playerOne = new Player(true);
-const playerTwo = new Player(false, true);
+const playerOne = new Player.Player(true);
+const playerTwo = new Player.AiPlayer(false, true);
 
 test("Test: Player's are initialized properly", () => {
   expect(playerOne.isAi).toBe(false);

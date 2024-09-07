@@ -1,8 +1,6 @@
 const Gameboard = require("./gameboard");
 const Ship = require("./ship");
-const { default: generateShipHitCoord } = require("../utils/adjacentCoords");
-const { default: handleSameCoords, default: bindAndHandleSameCoords } = require("../utils/handleSameCoords");
-const { default: bindAndGenerateValidChoices } = require("../utils/generateChoices");
+
 
 class Player {
 

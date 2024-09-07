@@ -1,5 +1,3 @@
-import shipDomInterface from "./shipDomInterface";
-
 export default class domInterface {
   static playerOneDiv = document.querySelector(".player-one");
 
@@ -58,7 +56,7 @@ export default class domInterface {
       );
 
       shipContainer.addEventListener("click", (e) =>
-        shipDomInterface.changeDomShipDirection(
+        domInterface.changeDomShipDirection(
           homePlayer.allShips[i],
           e.currentTarget,
         ),
@@ -183,5 +181,13 @@ export default class domInterface {
   static dragoverHandler(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
+  }
+
+  // a simple method that changess the ship direction for placement
+  static changeDomShipDirection(currentShip, shipContainer) {
+    shipContainer.style["flex-direction"] = currentShip.vertical
+      ? "row"
+      : "column";
+    currentShip.changeDirection();
   }
 }

@@ -1,4 +1,4 @@
-const Player = require("../js/player");
+const Player = require("../js/logic/player");
 
 const playerOne = new Player(true);
 const playerTwo = new Player(false, true);

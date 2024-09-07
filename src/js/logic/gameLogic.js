@@ -100,11 +100,11 @@ function openGameOverModal(winner, isAi) {
         ? `${winner} (Ai) Wins The Battle.`
         : `${winner} Wins The Battle.`;
     playBtn.textContent = "Play Again?";
-  
+
     [h2El, playBtn].forEach((el) => modalContainer.appendChild(el));
     modal.appendChild(modalContainer);
     document.body.appendChild(modal);
-  }, 2000)
+  }, 2000);
 
   playBtn.addEventListener(
     "click",
@@ -178,8 +178,8 @@ export default async function gameLogic(isAi) {
 
   if (gameStatus.gameover) {
     const winner = (gameStatus.turns % 2) - 1;
-    winner !== 0
-      ? openGameOverModal("Player One", isAi)
-      : openGameOverModal("Player Two", isAi);
+
+    if (winner !== 0) openGameOverModal("Player One", isAi);
+    else openGameOverModal("Player Two", isAi);
   }
 }

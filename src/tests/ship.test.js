@@ -1,4 +1,4 @@
-const Ship = require("../js/ship");
+const Ship = require("../js/logic/ship");
 
 let shipOne;
 let shipTwo;

@@ -1,5 +1,5 @@
-const Gameboard = require("../js/gameboard");
-const Ship = require("../js/ship");
+const Gameboard = require("../js/logic/gameboard");
+const Ship = require("../js/logic/ship");
 
 let gameBoard;
 let allShips;

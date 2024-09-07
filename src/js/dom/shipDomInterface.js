@@ -158,6 +158,9 @@ export default class shipDomInterface {
             if (isShip.id === aiPlayer.aiAttackStatus.currShip.id){
               aiPlayer.currentActiveHit.push([x, y])
             }
+            else{
+              aiPlayer.aiAttackStatus.hitQueue.push([x, y])
+            }
           }
 
           aiPlayer.aiAttackStatus.recentHit = [x, y];

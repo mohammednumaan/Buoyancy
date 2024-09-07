@@ -1,7 +1,7 @@
 class Gameboard {
   constructor() {
     this.board = new Array(10).fill(null).map(() => new Array(10).fill(null));
-    this.boardClone = structuredClone(this.board)
+    this.boardClone = structuredClone(this.board);
     this.allAttackCoords = [];
   }
 
@@ -38,20 +38,19 @@ class Gameboard {
   }
 
   recieveAttack(x, y) {
-    const isDuplicatedCoord = this.isSameCoord(x, y)
+    const isDuplicatedCoord = this.isSameCoord(x, y);
     if (isDuplicatedCoord) {
       return false;
     }
 
     if (!this.board[x][y]) {
       this.boardClone[x][y] = false;
-      
     } else {
       this.board[x][y].hit();
-      this.boardClone[x][y] = true;      
+      this.boardClone[x][y] = true;
     }
 
-    this.allAttackCoords.push([x, y])
+    this.allAttackCoords.push([x, y]);
     return true;
   }
 
@@ -59,10 +58,16 @@ class Gameboard {
     return shipArray.every((ship) => ship.isSunk());
   }
 
-  isSameCoord(x, y){
+  isSameCoord(x, y) {
     return this.allAttackCoords.some(
       (coord) => coord[0] === x && coord[1] === y,
     );
+  }
+
+  checkValidSquare(x, y){
+    if (x < 0 || x > 9) return false;
+    if (y < 0 || y > 9) return false;
+    return true;
   }
 }
 

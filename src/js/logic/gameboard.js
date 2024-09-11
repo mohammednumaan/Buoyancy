@@ -64,7 +64,9 @@ class Gameboard {
     );
   }
 
-  checkValidSquare(x, y){
+  checkSquare(square){
+    if (!square) return false;
+    let [x, y] = square
     if (x < 0 || x > 9) return false;
     if (y < 0 || y > 9) return false;
     return true;

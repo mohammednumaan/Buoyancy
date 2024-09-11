@@ -133,37 +133,31 @@ export default class shipDomInterface {
   static attackShipAI(aiPlayer, enemyPlayer, enemyDomBoard) {
     return new Promise((resolve) => {
       setTimeout(() => {
-
-        let coords = (aiPlayer.currentActiveHit.length !== 0) ? aiPlayer.generateAdjacentCoords(enemyPlayer) : Player.Player.generateRandomCoords(enemyPlayer);
-
+        let coords = (aiPlayer.bot.lastHitArray.length) ? aiPlayer.bot.attack(enemyPlayer) : Player.Player.generateRandomCoords(enemyPlayer);
         let [x, y] = coords;
         if (enemyPlayer.gameBoard.recieveAttack(x, y)) {
           const isShip = enemyPlayer.gameBoard.board[x][y];
           const cell = domInterface.getCellElement(x, y,  enemyDomBoard.className);
 
-          if (!aiPlayer.currentActiveHit.length && isShip){
-            aiPlayer.currentActiveHit.push([x, y])
-            aiPlayer.aiAttackStatus.currShip = isShip;
+          if (!aiPlayer.bot.lastHitArray.length && isShip){
+            console.log(isShip)
+            aiPlayer.bot.lastShip = isShip
+            aiPlayer.bot.lastHitArray.push([x, y])
           }
 
-          else if (aiPlayer.currentActiveHit.length === 1 && isShip){
-            if (isShip.id === aiPlayer.aiAttackStatus.currShip.id){
-              aiPlayer.secondHit = true;
-              aiPlayer.currentActiveHit.push([x, y])
-            }
 
-          }
-
-          else if (aiPlayer.currentActiveHit.length > 1 && isShip){
-            if (isShip.id === aiPlayer.aiAttackStatus.currShip.id){
-              aiPlayer.currentActiveHit.push([x, y])
-            }
-            else{
-              aiPlayer.aiAttackStatus.hitQueue.push([x, y])
+          else if (aiPlayer.bot.lastHitArray.length == 1){
+            if (isShip && isShip.id === aiPlayer.bot.lastShip.id){
+              aiPlayer.bot.isSecondHit = true;
+              aiPlayer.bot.lastHitArray.push([x, y])
             }
           }
 
-          aiPlayer.aiAttackStatus.recentHit = [x, y];
+          else if (aiPlayer.bot.lastHitArray.length > 1){
+            aiPlayer.bot.lastHitArray.push([x, y])
+
+          }
+
           shipDomInterface.#attackedShipClass(cell);
           resolve();
         }

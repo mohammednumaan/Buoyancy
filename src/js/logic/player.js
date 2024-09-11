@@ -1,3 +1,4 @@
+const AiLogic = require("./AiLogic");
 const Gameboard = require("./gameboard");
 const Ship = require("./ship");
 
@@ -34,6 +35,7 @@ class Player {
 class AiPlayer extends Player{
   constructor(turn , isAi){
     super(turn, isAi);
+    this.bot = AiLogic();
   }
 }
 

@@ -227,17 +227,6 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
         expect(ship.isSunk()).toBeTruthy()
 
     })
-
-    test("Tests whether it generates an adjacent coord when it has no adjacent coords and some of its squares are already hit", () => {
-        let shipOne = enemy.allShips[3];
-        let shipTwo = enemy.allShips[2];
-
-        enemy.gameBoard.placeShip(shipOne, 5, 4);
-        enemy.gameBoard.placeShip(shipTwo, 4, 4);
-
-
-
-    })
 })
 
 describe("Test: Tests whether the bot properly generates adjacent coords when there are nearby ships", () => {   

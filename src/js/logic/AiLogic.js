@@ -44,26 +44,24 @@ function AiLogic() {
                 let adjCoord = this.backTrackCoords(enemy);
                 let allAdjacentCells = this.getAdjacentChoices(enemy, adjCoord);
 
-                let adjacentChoices = allAdjacentCells.filter((choice) => {
-                    let ship = enemy.gameBoard.board[choice[0]][choice[1]];
-                    return ship && ship.id === this.lastShip.id
-                })
-                console.log('choices',  adjacentChoices)
                 // if there are no adjacent hits, retrieve the previous attack coords on this ship
-                if (!adjacentChoices.length){
+                if (!allAdjacentCells.length){
                     // generate an adjacent cell with the new computer direction
-                    let prevHit = this.backTrackAvailableMoves(enemy, lastHit);
-                    this.computeDirectionWhenBlocked(enemy, lastHit);
+                    let prevHit = this.backTrackCoords(enemy);
+                    if(enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] === true){
+                        this.hitDirection = this.flipDirection(this.hitDirection);
+                        prevHit = this.getAdjacentCell(prevHit, this.hitDirection);                        
+                    }
+                    console.log('UUUUUU--------', prevHit)
                     while (enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] === true) {
                         prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
                     }
-                    console.log(prevHit)
                     return prevHit;
                 } 
                 
                 // else, simply select the new adjacent coord 
-                let randomIdx = Math.floor(Math.random() * adjacentChoices.length)
-                let adjHit = adjacentChoices[randomIdx]
+                let randomIdx = Math.floor(Math.random() * allAdjacentCells.length)
+                let adjHit = allAdjacentCells[randomIdx]
                 // generate a new adjacent cell with the new direction if it encounters a hit square
                 while (enemy.gameBoard.boardClone[adjHit[   0]][adjHit[1]] === true) {
                     adjHit = this.getAdjacentCell(adjHit, this.hitDirection);

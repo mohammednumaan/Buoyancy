@@ -74,12 +74,12 @@ function AiLogic() {
                 // generate an adjacent cell to attack
                 let adjCoord = this.getAdjacentCell(lastHit, this.hitDirection);    
                 let isValid = enemy.gameBoard.checkSquare(adjCoord);
+                console.log(adjCoord)
                 
                 // if the new cell is invalid, i.e out of bounds, flip the direction of attack
-                if (!isValid || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false || (!isSameShip && enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true)) {
+                if (!isValid || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false || (isSameShip && enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true)) {
                     this.hitDirection = this.flipDirection(this.hitDirection);
-                    adjCoord = this.getAdjacentCell(lastHit, this.hitDirection);
-                    console.log('NO-------------', adjCoord, this.hitDirection)
+                    adjCoord = this.getAdjacentCell(adjCoord, this.hitDirection);
                 }
                 // console.log('IN11---', this.hitDirection, adjCoord)
                 // this.hitDirection = this.computeHitDirection(adjCoord)
@@ -127,6 +127,7 @@ function AiLogic() {
                 while (enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true) {
                     adjCoord = this.getAdjacentCell(adjCoord, this.hitDirection);
                 }
+                console.log('HERE---', adjCoord)
                 return adjCoord
 
             }
@@ -154,8 +155,19 @@ function AiLogic() {
 
         if (!adjacentChoices.length){
             let prevHit = this.backTrackAvailableMoves(enemy, lastHit);
+
+            console.log('BACK ', prevHit, 'dir', this.hitDirection)
             this.computeDirectionWhenBlocked(enemy, lastHit);
-            // generate an adjacent cell with the new computer direction
+
+
+            prevHit = this.getAdjacentCell(lastHit, this.hitDirection);
+
+            let isValid = enemy.gameBoard.checkSquare(prevHit);
+            if (!isValid){
+                this.hitDirection = this.flipDirection(this.hitDirection)
+                prevHit = this.getAdjacentCell(lastHit, this.hitDirection);
+                
+            }
             while (enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] === true) {
                 prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
             }
@@ -163,7 +175,6 @@ function AiLogic() {
         } 
 
         let randomIdx = Math.floor(Math.random() * adjacentChoices.length);
-        console.log(adjacentChoices, 'in', this.hitDirection)
         return adjacentChoices[randomIdx];
 
     }
@@ -259,12 +270,12 @@ function AiLogic() {
         }
     }
 
-    function backTrackAvailableMoves(enemy, cell){
+    function backTrackAvailableMoves(enemy){
         for (let i = this.availableMoves.length - 1; i >= 0; i--){
-            let [x, y] = cell;
+            let [x, y] = this.availableMoves[i];
             let ship = enemy.gameBoard.board[x][y]
             if (ship && this.lastShip.id === ship.id) {
-                return [x, y]
+                return this.availableMoves[i]
             }
         }
     }
@@ -290,7 +301,6 @@ function AiLogic() {
             }
         }
         let adjHit = coords[Math.floor(Math.random() * coords.length)]
-        console.log(adjHit, cell, coords)
         this.hitDirection = this.computeHitDirection(cell, adjHit)
     }
 

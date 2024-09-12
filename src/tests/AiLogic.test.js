@@ -215,7 +215,6 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
         const [x1, y1] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x1, y1)
         bot.lastHitArray.push([x1, y1]);
-        console.log(x1, y1, 'I------------')
         expect(x1).toEqual(5)
         expect(y1).toEqual(9)
 
@@ -246,17 +245,24 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
         
         enemy.gameBoard.recieveAttack(1, 0)
 
-        // enemy.gameBoard.recieveAttack(5, 7)
-        // bot.availableMoves.push([5, 7])
 
         enemy.gameBoard.recieveAttack(0, 0)
         bot.lastHitArray.push([0, 0]);
         bot.lastShip = ship;
+
+        console.log('-----------------------------------------------------')
         const [x1, y1] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x1, y1)
         bot.lastHitArray.push([x1, y1]);
+        bot.isSecondHit = true;
         expect(x1).toEqual(0)
         expect(y1).toEqual(2)
+
+        const [x3, y3] = bot.attack(enemy)
+        enemy.gameBoard.recieveAttack(x3, y3)
+        bot.lastHitArray.push([x3, y3]);
+        expect(x3).toEqual(0)
+        expect(y3).toEqual(3)
 
 
 
@@ -342,7 +348,7 @@ describe("Test: Tests whether the bot properly generates adjacent coords when th
         enemy.gameBoard.recieveAttack(x2, y2)
         bot.lastHitArray.push([x2, y2])
 
-        expect(shipOne.isSunk()).toBeTruthy()
+        expect(shipOne.isSunk()).toBeTruthy()   
 
     })
 })

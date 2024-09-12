@@ -7,7 +7,7 @@ let enemy = new Player(false, false);
 beforeEach(() => {
     bot = AiLogic();
     enemy = new Player(false, true);
-})
+})  
 
     describe("Test: Generates all possible valid adjacent coords", () => {
         test('Tests whether valid coords are being generated for an attack in the middle of the board', () => {
@@ -76,17 +76,25 @@ describe("Test: Initial hit is on the end of the ships", () => {
 
         let [x1, y1] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x1, y1)
+        bot.lastHitArray.push([x1, y1]);
+
         expect(bot.hitDirection).toEqual('right');
         console.log(x1, y1)
 
         let [x2, y2] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x2, y2)
+        bot.lastHitArray.push([x2, y2]);
+
 
         let [x3, y3] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x3, y3)
+        bot.lastHitArray.push([x3, y3]);
+
 
         let [x4, y4] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x4, y4)
+        bot.lastHitArray.push([x4, y4]);
+
         expect(ship.isSunk()).toBeTruthy()
         
     })
@@ -279,36 +287,37 @@ describe("Test: Tests whether the bot properly generates adjacent coords when th
             expect(shipTwo.isSunk()).toBeTruthy();  
         }
         
-        // expect(x2).toEqual(8); 
-        // expect(y2).toEqual(6);
-
-
-        // let [x4, y4] = bot.attack(enemy)
-        // enemy.gameBoard.recieveAttack(x4, y4)
-        // bot.lastHitArray.push([x4, y4])
-
-        // if (x4 === 9 && y4 === 4){
-        //     let [x5, y5] = bot.attack(enemy)
-        //     enemy.gameBoard.recieveAttack(x5, y5)
-        //     bot.lastHitArray.push([x5, y5])
-            
-        //     let [x6, y6] = bot.attack(enemy)
-        //     enemy.gameBoard.recieveAttack(x6, y6)
-        //     bot.lastHitArray.push([x6, y6])
-        //     expect(shipTwo.isSunk()).toBeTruthy();
-
-        // } 
-
-        // else{
-        //     let [x5, y5] = bot.attack(enemy)
-        //     enemy.gameBoard.recieveAttack(x5, y5)
-        //     bot.lastHitArray.push([x5, y5])
-            
-        //     let [x6, y6] = bot.attack(enemy)
-        //     enemy.gameBoard.recieveAttack(x6, y6)
-        //     bot.lastHitArray.push([x6, y6])
-        //     expect(shipTwo.isSunk()).toBeTruthy();
-
-        // }
     })
+        test("Test whether the direction is flipped when encountering a different ship hit", () => {
+        let shipOne = enemy.allShips[3]
+        let shipTwo = enemy.allShips[2]
+
+        shipTwo.changeDirection();
+        enemy.gameBoard.placeShip(shipOne, 5, 5)
+        enemy.gameBoard.placeShip(shipTwo, 4, 9)
+
+        enemy.gameBoard.recieveAttack(4, 9)
+        enemy.gameBoard.recieveAttack(5, 9)
+        enemy.gameBoard.recieveAttack(6, 9)
+        expect(shipTwo.isSunk()).toBeTruthy();
+
+        enemy.gameBoard.recieveAttack(5, 7)
+        bot.lastHitArray.push([5, 7])
+        bot.lastShip = shipOne
+
+        enemy.gameBoard.recieveAttack(5, 8)
+        bot.lastHitArray.push([5, 8])
+        bot.isSecondHit = true;
+        
+
+        let [x1, y1] = bot.attack(enemy)
+        enemy.gameBoard.recieveAttack(x1, y1)
+        bot.lastHitArray.push([x1, y1])
+
+        let [x2, y2] = bot.attack(enemy)
+        enemy.gameBoard.recieveAttack(x2, y2)
+        bot.lastHitArray.push([x2, y2])
+        expect([[5, 6]]).toEqual(expect.arrayContaining([[x2, y2]]))
+
+        })
 })

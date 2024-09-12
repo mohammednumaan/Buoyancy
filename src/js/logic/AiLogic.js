@@ -43,6 +43,7 @@ function AiLogic() {
                 // then, stop attacking in that direction
                 let adjCoord = this.backTrackCoords(enemy);
                 let allAdjacentCells = this.getAdjacentChoices(enemy, adjCoord);
+
                 let adjacentChoices = allAdjacentCells.filter((choice) => {
                     let ship = enemy.gameBoard.board[choice[0]][choice[1]];
                     return ship && ship.id === this.lastShip.id
@@ -56,6 +57,7 @@ function AiLogic() {
                     while (enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] === true) {
                         prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
                     }
+                    console.log(prevHit)
                     return prevHit;
                 } 
                 
@@ -63,7 +65,7 @@ function AiLogic() {
                 let randomIdx = Math.floor(Math.random() * adjacentChoices.length)
                 let adjHit = adjacentChoices[randomIdx]
                 // generate a new adjacent cell with the new direction if it encounters a hit square
-                while (enemy.gameBoard.boardClone[adjHit[0]][adjHit[1]] === true) {
+                while (enemy.gameBoard.boardClone[adjHit[   0]][adjHit[1]] === true) {
                     adjHit = this.getAdjacentCell(adjHit, this.hitDirection);
                 }
                 return adjHit;
@@ -76,9 +78,10 @@ function AiLogic() {
                 let isValid = enemy.gameBoard.checkSquare(adjCoord);
                 
                 // if the new cell is invalid, i.e out of bounds, flip the direction of attack
-                if (!isValid || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false) {
+                if (!isValid || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false || (!isSameShip && enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true)) {
                     this.hitDirection = this.flipDirection(this.hitDirection);
                     adjCoord = this.getAdjacentCell(lastHit, this.hitDirection);
+                    console.log('NO-------------', adjCoord, this.hitDirection)
                 }
                 // console.log('IN11---', this.hitDirection, adjCoord)
                 // this.hitDirection = this.computeHitDirection(adjCoord)

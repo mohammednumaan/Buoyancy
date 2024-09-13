@@ -39,7 +39,6 @@ function AiLogic() {
             // check if the recet hit was a different hit
             if (!isSameShip) {
                 // push it to available attacks for future reference
-                this.availableMoves.push(lastHit);
                 // then, stop attacking in that direction
                 let adjCoord = this.backTrackCoords(enemy);
                 let allAdjacentCells = this.getAdjacentChoices(enemy, adjCoord);
@@ -74,19 +73,29 @@ function AiLogic() {
                 // generate an adjacent cell to attack
                 let adjCoord = this.getAdjacentCell(lastHit, this.hitDirection);    
                 let isValid = enemy.gameBoard.checkSquare(adjCoord);
-                console.log(adjCoord)
-                
+                let isSame;
+
+                if (isValid){
+                    let ship = enemy.gameBoard.board[adjCoord[0]][adjCoord[1]]
+                    isSame = ship && this.lastShip.id === ship.id;
+                }
                 // if the new cell is invalid, i.e out of bounds, flip the direction of attack
-                if (!isValid || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false || (isSameShip && enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true)) {
+                if (!isValid || (!isSame && enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true) || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false) {
+                    
                     this.hitDirection = this.flipDirection(this.hitDirection);
                     adjCoord = this.getAdjacentCell(adjCoord, this.hitDirection);
                 }
-                // console.log('IN11---', this.hitDirection, adjCoord)
-                // this.hitDirection = this.computeHitDirection(adjCoord)
-                // then, loop until we find a valid coord that is empty only if the new coords has a hit square
+                console.log('IN11---', this.hitDirection, adjCoord)
                 while (enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true) {
                     adjCoord = this.getAdjacentCell(adjCoord, this.hitDirection);
+                    if (!enemy.gameBoard.checkSquare(adjCoord)){
+                        this.hitDirection = this.flipDirection(this.hitDirection);
+                        adjCoord = this.getAdjacentCell(adjCoord, this.hitDirection);
+                    }
                 }
+                console.log(!isSame, 'SHOPPPPPPPP', adjCoord, this.hitDirection)
+                // this.hitDirection = this.computeHitDirection(adjCoord)
+                // then, loop until we find a valid coord that is empty only if the new coords has a hit square
 
                 // console.log('IN222---', this.hitDirection, adjCoord)
                 return adjCoord 
@@ -158,18 +167,18 @@ function AiLogic() {
 
             console.log('BACK ', prevHit, 'dir', this.hitDirection)
             this.computeDirectionWhenBlocked(enemy, lastHit);
-
-
+            console.log(this.hitDirection)
             prevHit = this.getAdjacentCell(lastHit, this.hitDirection);
 
             let isValid = enemy.gameBoard.checkSquare(prevHit);
-            if (!isValid){
+            if (!isValid || enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] !== null){
                 this.hitDirection = this.flipDirection(this.hitDirection)
-                prevHit = this.getAdjacentCell(lastHit, this.hitDirection);
-                
+                prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
+                console.log('prev', prevHit)
             }
             while (enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] === true) {
                 prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
+                console.log('while', prevHit)
             }
             return prevHit;
         } 
@@ -296,11 +305,13 @@ function AiLogic() {
         for (let i = this.availableMoves.length - 1; i >= 0; i--){
             let [x, y] = this.availableMoves[i];
             let ship = enemy.gameBoard.board[x][y]
-            if (ship && this.lastShip.id === ship.id) {
+            let isSame = cell[0] === x && cell[1] === y
+            if (ship && this.lastShip.id === ship.id && !isSame) {
                 coords.push([x, y]);
             }
         }
         let adjHit = coords[Math.floor(Math.random() * coords.length)]
+        console.log('ADJJJJJJ', cell, adjHit, coords)
         this.hitDirection = this.computeHitDirection(cell, adjHit)
     }
 

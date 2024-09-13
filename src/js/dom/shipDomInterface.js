@@ -151,9 +151,17 @@ export default class shipDomInterface {
               aiPlayer.bot.isSecondHit = true;
               aiPlayer.bot.lastHitArray.push([x, y])
             }
+            else{
+              aiPlayer.bot.availableMoves.push([x, y]);
+
+            }
           }
 
           else if (aiPlayer.bot.lastHitArray.length > 1){
+            if (isShip && isShip.id !== aiPlayer.bot.lastShip.id){
+              aiPlayer.bot.availableMoves.push([x, y]);
+
+            }
             aiPlayer.bot.lastHitArray.push([x, y])
 
           }

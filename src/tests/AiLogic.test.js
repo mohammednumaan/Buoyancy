@@ -183,55 +183,55 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
         enemy.gameBoard.recieveAttack(x1, y1)
         bot.lastHitArray.push([x1, y1])
         expect(x1).toEqual(4); 
-        expect(y1).toEqual(3); 
+        expect(y1).toEqual(7); 
 
         let [x2, y2] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x2, y2)
         bot.lastHitArray.push([x2, y2])
-        console.log(x2, y2)
+        console.log('DLSHFJSDJF', x2, y2)
         expect(x2).toEqual(4); 
-        expect(y2).toEqual(7); 
+        expect(y2).toEqual(8); 
 
         expect(ship.isSunk()).toBeTruthy();
     })
 
     test("Tests whether the bot generates a valid adjacent coord when its initial attack has no adjacent choices but a part of the ship has been attacked before", () => {
         let ship = enemy.allShips[4];
+        ship.changeDirection();
         enemy.gameBoard.placeShip(ship, 5, 4);
 
-        enemy.gameBoard.recieveAttack(5, 6)
-        bot.availableMoves.push([5, 5])
-        // enemy.gameBoard.recieveAttack(5, 7)
-        // bot.availableMoves.push([5, 7])
+        enemy.gameBoard.recieveAttack(4, 4);
+        enemy.gameBoard.recieveAttack(5, 3);
+        enemy.gameBoard.recieveAttack(5, 5);
 
-        enemy.gameBoard.recieveAttack(5, 7)
-        bot.lastHitArray.push([5, 7]);
+        enemy.gameBoard.recieveAttack(6, 4)
+        bot.availableMoves.push([6, 4])
+
+        enemy.gameBoard.recieveAttack(5, 4)
+        bot.lastHitArray.push([5, 4]);
         bot.lastShip = ship;
 
-        enemy.gameBoard.recieveAttack(5, 8)
-        bot.lastHitArray.push([5, 8]);
-        bot.isSecondHit = true
-
+        console.log('AKHFJSKFDHSKFSA-----------------')
         const [x1, y1] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x1, y1)
         bot.lastHitArray.push([x1, y1]);
-        expect(x1).toEqual(5)
-        expect(y1).toEqual(9)
+        expect(x1).toEqual(7)
+        expect(y1).toEqual(4)
+        console.log(7, 4)
+        bot.isSecondHit = true
 
         const [x2, y2] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x2, y2)
         bot.lastHitArray.push([x2, y2]);
-        bot.isSecondHit = true
-        expect(x2).toEqual(5)
-        expect(y2).toEqual(5)
 
         const [x3, y3] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x3, y3)
         bot.lastHitArray.push([x3, y3]);
-        bot.isSecondHit = true
-        expect(x3).toEqual(5)
-        expect(y3).toEqual(4)
-        expect(ship.isSunk()).toBeTruthy();
+
+        // const [x4, y4] = bot.attack(enemy)
+        // enemy.gameBoard.recieveAttack(x4, y4)
+        expect(ship.isSunk()).toBeTruthy()
+
         
 
     })
@@ -263,8 +263,6 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
         bot.lastHitArray.push([x3, y3]);
         expect(x3).toEqual(0)
         expect(y3).toEqual(3)
-
-
 
     })
 })

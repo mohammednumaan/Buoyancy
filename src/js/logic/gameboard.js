@@ -8,16 +8,14 @@ class Gameboard {
   isValidCoords(ship, x, y) {
     for (let i = 0; i < ship.length; i += 1) {
       if (
-        !ship.vertical &&
-        (y + i >= this.board.length || this.board[x][y + i] !== null)
-      )
-        return false;
+        !ship.vertical
+        && (y + i >= this.board.length || this.board[x][y + i] !== null)
+      ) return false;
 
       if (
-        ship.vertical &&
-        (x + i >= this.board.length || this.board[x + i][y] !== null)
-      )
-        return false;
+        ship.vertical
+        && (x + i >= this.board.length || this.board[x + i][y] !== null)
+      ) return false;
     }
     return true;
   }
@@ -62,14 +60,6 @@ class Gameboard {
     return this.allAttackCoords.some(
       (coord) => coord[0] === x && coord[1] === y,
     );
-  }
-
-  checkSquare(square){
-    if (!square) return false;
-    let [x, y] = square
-    if (x < 0 || x > 9) return false;
-    if (y < 0 || y > 9) return false;
-    return true;
   }
 }
 

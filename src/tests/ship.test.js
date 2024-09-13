@@ -1,4 +1,4 @@
-const Ship = require("../js/logic/ship");
+const Ship = require('../js/logic/ship');
 
 let shipOne;
 let shipTwo;
@@ -11,17 +11,17 @@ afterEach(() => {
   shipTwo.hits = 0;
 });
 
-test("Check if Ship Object is Initialized Properly", () => {
-  expect(shipOne).toHaveProperty("length", 2);
-  expect(shipOne).toHaveProperty("hits", 0);
-  expect(shipOne).toHaveProperty("vertical", false);
+test('Check if Ship Object is Initialized Properly', () => {
+  expect(shipOne).toHaveProperty('length', 2);
+  expect(shipOne).toHaveProperty('hits', 0);
+  expect(shipOne).toHaveProperty('vertical', false);
 
-  expect(shipTwo).toHaveProperty("length", 3);
-  expect(shipTwo).toHaveProperty("hits", 0);
-  expect(shipTwo).toHaveProperty("vertical", false);
+  expect(shipTwo).toHaveProperty('length', 3);
+  expect(shipTwo).toHaveProperty('hits', 0);
+  expect(shipTwo).toHaveProperty('vertical', false);
 });
 
-test("Check if Ship Object can change direction", () => {
+test('Check if Ship Object can change direction', () => {
   shipOne.changeDirection();
   expect(shipOne.vertical).toBe(true);
 
@@ -29,7 +29,7 @@ test("Check if Ship Object can change direction", () => {
   expect(shipOne.vertical).toBe(false);
 });
 
-test("Check if Ship Object Is Hit Properly", () => {
+test('Check if Ship Object Is Hit Properly', () => {
   shipOne.hit();
   shipOne.hit();
   shipTwo.hit();
@@ -39,7 +39,7 @@ test("Check if Ship Object Is Hit Properly", () => {
   expect(shipTwo.hits).toBe(2);
 });
 
-test("Check if Ship Object is Sunk", () => {
+test('Check if Ship Object is Sunk', () => {
   shipOne.hit();
   shipOne.hit();
   shipTwo.hit();

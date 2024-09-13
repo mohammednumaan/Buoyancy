@@ -1,10 +1,8 @@
-const AiLogic = require("./AiLogic");
-const Gameboard = require("./gameboard");
-const Ship = require("./ship");
-
+const AiLogic = require('./AiLogic');
+const Gameboard = require('./gameboard');
+const Ship = require('./ship');
 
 class Player {
-
   constructor(turn, isAi = false) {
     this.gameBoard = new Gameboard();
     this.allShips = Ship.createShips();
@@ -20,20 +18,19 @@ class Player {
   // a simple method that generates unique and random [x, y] tuples
   // for the AI to attack and place ships on its board
   static generateRandomCoords(humanPlayer) {
-    const nullCoords = []
+    const nullCoords = [];
     humanPlayer.gameBoard.boardClone.forEach((xCoord, xIdx) => {
       xCoord.forEach((yCoord, yIdx) => {
         if (yCoord === null) nullCoords.push([xIdx, yIdx]);
-      })
-    })
+      });
+    });
     const randomIdx = Math.floor(Math.random() * nullCoords.length);
     return nullCoords[randomIdx];
   }
-
 }
 
-class AiPlayer extends Player{
-  constructor(turn , isAi){
+class AiPlayer extends Player {
+  constructor(turn, isAi) {
     super(turn, isAi);
     this.bot = AiLogic();
   }

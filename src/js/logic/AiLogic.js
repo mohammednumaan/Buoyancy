@@ -42,6 +42,7 @@ function AiLogic() {
                 // then, stop attacking in that direction
                 let adjCoord = this.backTrackCoords(enemy);
                 let allAdjacentCells = this.getAdjacentChoices(enemy, adjCoord);
+                allAdjacentCells = allAdjacentCells.filter((coord) => enemy.gameBoard.board[coord[0]][coord[1]] !== null)
 
                 // if there are no adjacent hits, retrieve the previous attack coords on this ship
                 if (!allAdjacentCells.length){
@@ -61,8 +62,9 @@ function AiLogic() {
                 // else, simply select the new adjacent coord 
                 let randomIdx = Math.floor(Math.random() * allAdjacentCells.length)
                 let adjHit = allAdjacentCells[randomIdx]
+                console.log('HIHIHIHIHIHIH', this.hitDirection, adjHit)
                 // generate a new adjacent cell with the new direction if it encounters a hit square
-                while (enemy.gameBoard.boardClone[adjHit[   0]][adjHit[1]] === true) {
+                while (enemy.gameBoard.boardClone[adjHit[0]][adjHit[1]] === true) {
                     adjHit = this.getAdjacentCell(adjHit, this.hitDirection);
                 }
                 return adjHit;
@@ -77,7 +79,7 @@ function AiLogic() {
 
                 if (isValid){
                     let ship = enemy.gameBoard.board[adjCoord[0]][adjCoord[1]]
-                    isSame = ship && this.lastShip.id === ship.id;
+                    isSame = ship ? this.lastShip.id === ship.id : true;
                 }
                 // if the new cell is invalid, i.e out of bounds, flip the direction of attack
                 if (!isValid || (!isSame && enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true) || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false) {
@@ -94,10 +96,6 @@ function AiLogic() {
                     }
                 }
                 console.log(!isSame, 'SHOPPPPPPPP', adjCoord, this.hitDirection)
-                // this.hitDirection = this.computeHitDirection(adjCoord)
-                // then, loop until we find a valid coord that is empty only if the new coords has a hit square
-
-                // console.log('IN222---', this.hitDirection, adjCoord)
                 return adjCoord 
             }
 
@@ -105,6 +103,7 @@ function AiLogic() {
             // check if the last hit was not a ship hit
             if (enemy.gameBoard.boardClone[lastHit[0]][lastHit[1]] === false && this.isSecondHit === true) {
                 // if the direction is flipped and it still is not a ship hit
+                console.log('WHATTTTTTTTTTTTTTTTT', lastHit)
                 if (this.isFlipped) {
                     // then backtrack the lasthit array to find the initial point of attack of this ship
                     let adjCoord = this.backTrackCoords(enemy);
@@ -137,23 +136,32 @@ function AiLogic() {
                     adjCoord = this.getAdjacentCell(adjCoord, this.hitDirection);
                 }
                 console.log('HERE---', adjCoord)
-                return adjCoord
+                return adjCoord 
 
             }
             let adjCoord = this.backTrackCoords(enemy);
             let adjacentChoices = this.getAdjacentChoices(enemy, adjCoord);
-    
+            console.log(adjacentChoices, 'choicc')
             if (!adjacentChoices.length){
-                let prevHit = this.backTrackAvailableMoves(enemy, adjCoord);
-                // generate an adjacent cell with the new computer direction
+                let prevHit = this.backTrackAvailableMoves(enemy, lastHit);
+    
+                this.computeDirectionWhenBlocked(enemy, prevHit);
+                console.log('dirrr', this.hitDirection)
+                prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
+    
+                let isValid = enemy.gameBoard.checkSquare(prevHit);
+                if (!isValid || enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] !== null){
+                    this.hitDirection = this.flipDirection(this.hitDirection)
+                    prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
+                }
                 while (enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] === true) {
                     prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
+                    console.log('while', prevHit)
                 }
                 return prevHit;
             } 
     
             let randomIdx = Math.floor(Math.random() * adjacentChoices.length);
-            console.log(adjacentChoices, 'soihfdaskn', this.hitDirection)
             return adjacentChoices[randomIdx];
     
         }
@@ -165,9 +173,7 @@ function AiLogic() {
         if (!adjacentChoices.length){
             let prevHit = this.backTrackAvailableMoves(enemy, lastHit);
 
-            console.log('BACK ', prevHit, 'dir', this.hitDirection)
             this.computeDirectionWhenBlocked(enemy, lastHit);
-            console.log(this.hitDirection)
             prevHit = this.getAdjacentCell(lastHit, this.hitDirection);
 
             let isValid = enemy.gameBoard.checkSquare(prevHit);

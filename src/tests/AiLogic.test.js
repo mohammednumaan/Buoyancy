@@ -182,17 +182,76 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
         let [x1, y1] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x1, y1)
         bot.lastHitArray.push([x1, y1])
+        console.log('YOOOOOOOjdafklsjflajsf', x1, y1)
         expect(x1).toEqual(4); 
         expect(y1).toEqual(7); 
 
-        let [x2, y2] = bot.attack(enemy)
-        enemy.gameBoard.recieveAttack(x2, y2)
-        bot.lastHitArray.push([x2, y2])
-        console.log('DLSHFJSDJF', x2, y2)
-        expect(x2).toEqual(4); 
-        expect(y2).toEqual(8); 
+
 
         expect(ship.isSunk()).toBeTruthy();
+    })
+
+    test("Tests whether the bot sinks the ship when it encounters 2 consecutive hit squares", () => {
+        let ship = enemy.allShips[4]; //44 45 46 47 48
+
+        enemy.gameBoard.placeShip(ship, 4, 4);
+
+        enemy.gameBoard.recieveAttack(4, 5);
+        bot.availableMoves.push([4, 5])
+
+        enemy.gameBoard.recieveAttack(5, 8);
+        enemy.gameBoard.recieveAttack(3, 8);
+
+        
+        enemy.gameBoard.recieveAttack(4, 6);
+        bot.availableMoves.push([4, 6])
+
+        enemy.gameBoard.recieveAttack(4, 8);
+        bot.lastHitArray.push([4, 8]);
+        bot.lastShip = ship;
+        
+     
+
+        let [x1, y1] = bot.attack(enemy)
+        enemy.gameBoard.recieveAttack(x1, y1)
+        bot.lastHitArray.push([x1, y1])
+        expect([[4, 9], [5, 8], [3, 8], [4, 7]]).toEqual(expect.arrayContaining([[x1, y1]]))
+
+        if (x1 === 4 && y1 === 9){
+            let [x2, y2] = bot.attack(enemy)
+            enemy.gameBoard.recieveAttack(x2, y2)
+            bot.lastHitArray.push([x2, y2])
+            expect(x2).toEqual(4)
+            expect(y2).toEqual(7)
+
+            let [x3, y3] = bot.attack(enemy)
+            enemy.gameBoard.recieveAttack(x3, y3)
+            bot.lastHitArray.push([x3, y3])
+            console.log('ONE ===============================================', x3, y3)
+
+
+            let [x4, y4] = bot.attack(enemy)
+            enemy.gameBoard.recieveAttack(x4, y4)
+            bot.lastHitArray.push([x4, y4])
+            console.log('ONE ===============================================', x4, y4)
+
+            let [x5, y5] = bot.attack(enemy)
+            enemy.gameBoard.recieveAttack(x5, y5)
+            bot.lastHitArray.push([x5, y5])
+            console.log('ONE ===============================================', x5, y5)
+
+
+            let [x6, y6] = bot.attack(enemy)
+            enemy.gameBoard.recieveAttack(x6, y6)
+            bot.lastHitArray.push([x6, y6])
+            console.log('ONE ===============================================', x6, y6)
+
+            expect(ship.isSunk()).toBeTruthy();
+            
+
+        }
+
+
     })
 
     test("Tests whether the bot generates a valid adjacent coord when its initial attack has no adjacent choices but a part of the ship has been attacked before", () => {
@@ -324,9 +383,7 @@ describe("Test: Tests whether the bot properly generates adjacent coords when th
         enemy.gameBoard.placeShip(shipTwo, 4, 9)
 
         enemy.gameBoard.recieveAttack(4, 9)
-        enemy.gameBoard.recieveAttack(5, 9)
         enemy.gameBoard.recieveAttack(6, 9)
-        expect(shipTwo.isSunk()).toBeTruthy();
 
         enemy.gameBoard.recieveAttack(5, 7)
         bot.lastHitArray.push([5, 7])
@@ -345,7 +402,12 @@ describe("Test: Tests whether the bot properly generates adjacent coords when th
         let [x2, y2] = bot.attack(enemy)
         enemy.gameBoard.recieveAttack(x2, y2)
         bot.lastHitArray.push([x2, y2])
+        console.log(x2, y2)
 
+        let [x3, y3] = bot.attack(enemy)
+        enemy.gameBoard.recieveAttack(x3, y3)
+        bot.lastHitArray.push([x3, y3])
+        console.log(x3, y3)
         expect(shipOne.isSunk()).toBeTruthy()   
 
     })

@@ -44,6 +44,7 @@ button:disabled{
 
 }
 
+
 .header{
     text-align: center;
     color: var(--color);
@@ -84,14 +85,14 @@ button:disabled{
     gap: 16px;
     
     width: 30vh;
-    height: 43vh;
-    margin-top: 8vh;
+    height: 36vh;
+    margin-top: 7vh;
     margin-right: 10vh;
     
     padding: 10px;
-    /* padding-left: 20px; */
-    border: 6px solid var(--color);
-    border-radius: 10px;
+    padding-left: 20px;
+    border: 2px solid var(--color);
+    /* border-radius: 10px; */
     overflow-y: auto;
 }
 
@@ -130,9 +131,17 @@ button:disabled{
     background-color: #957eff;
 }
 
-#reset-btn{
-    width: 33vh;
+#reset-btn,
+#random-btn,
+#continue-btn{
+    width: 33.5vh;
     height: 26px;
+    border-radius: 3px;
+}
+
+#random-btn,
+#continue-btn{
+    display: none;
 }
 
 
@@ -145,7 +154,6 @@ button:disabled{
     padding: 40px;
     margin-top: 10vh;
 
-    /* box-shadow: var(--color) 0px 2px 4px 0px, var(--color) 0px 2px 16px 0px; */
     
 }
 
@@ -163,14 +171,14 @@ button:disabled{
 .player-two-board{
     display: grid;
     margin-right: 4vh;
-    width: 500px;
-    height: 500px;
+    width: 400px;
+    height: 400px;
     border: 6px solid var(--color);
 }
 
 .board-cell{
-    width: 48px;
-    height: 48px;
+    width: 38px;
+    height: 38px;
     border: 1px solid var(--color);
 }
 
@@ -276,3 +284,106 @@ button:disabled{
     }
 
   }
+
+
+@media (max-width: 500px) {
+
+    body {
+        font-size: 14px;
+    }
+
+    .header{
+        text-align: center;
+        color: var(--color);
+    }
+
+    .footer {
+        position: absolute;
+        z-index: -1;
+        color: var(--color);
+        
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: -80px;
+        top: 104vh;
+        font-size: 10px;
+    }
+
+
+    .game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-top: 10vh;
+    }
+
+    .dashboard-container {
+        /* width: 100%;/ */
+        height: auto;
+        margin-top: 5vh;
+    }
+
+    .board-container {
+        display: flex;
+        justify-self: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+        padding: 0px;
+        margin-top: 5vh;
+    }
+
+    .player-one-board,
+    .player-two-board {
+        width: 270px;
+        height: 270px;
+        margin: auto;
+    }
+
+
+    .board-cell {
+        width: 25px;
+        height: 25px;
+    }
+
+    .ship-container {
+        flex-direction: column;
+    }
+
+    #reset-btn,
+    #play-again-btn {
+        width: 112%;
+        height: 35px;
+    }
+
+    .player-one > h4,
+    .player-two > h4{
+        margin: 0px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    #random-btn,
+    #continue-btn{
+        width: 100%;
+        margin: auto;
+    }
+
+    .game-mode-buttons > button {
+        width: 100%;
+    }
+
+    .starter-screen {
+        margin-top: 10vh;
+    }
+
+    .game-over-modal {
+        padding: 10px;
+    }
+}
+

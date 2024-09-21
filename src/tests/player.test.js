@@ -1,4 +1,4 @@
-const Player = require("../js/logic/player");
+const Player = require('../js/logic/player');
 
 const playerOne = new Player.Player(true);
 const playerTwo = new Player.AiPlayer(false, true);

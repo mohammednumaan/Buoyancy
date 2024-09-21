@@ -1,5 +1,5 @@
-const AiLogic = require("../js/logic/AiLogic");
-const { Player } = require("../js/logic/player");
+const AiLogic = require('../js/logic/AiLogic');
+const { Player } = require('../js/logic/player');
 
 let bot = AiLogic();
 let enemy = new Player(false, false);
@@ -9,8 +9,8 @@ beforeEach(() => {
   enemy = new Player(false, true);
 });
 
-describe("Test: Generates all possible valid adjacent coords", () => {
-  test("Tests whether valid coords are being generated for an attack in the middle of the board", () => {
+describe('Test: Generates all possible valid adjacent coords', () => {
+  test('Tests whether valid coords are being generated for an attack in the middle of the board', () => {
     bot.lastHitArray.push([4, 5]);
     const lastHit = bot.lastHitArray[bot.lastHitArray.length - 1];
 
@@ -25,7 +25,7 @@ describe("Test: Generates all possible valid adjacent coords", () => {
     );
   });
 
-  test("Tests whether valid coords are being generated for an attack near an invalid index (near 0) of the board", () => {
+  test('Tests whether valid coords are being generated for an attack near an invalid index (near 0) of the board', () => {
     bot.lastHitArray.push([0, 0]);
     const lastHit = bot.lastHitArray[bot.lastHitArray.length - 1];
 
@@ -38,7 +38,7 @@ describe("Test: Generates all possible valid adjacent coords", () => {
     );
   });
 
-  test("Tests whether coords are being generated for an attack near an invalid index (near 9) of the board", () => {
+  test('Tests whether coords are being generated for an attack near an invalid index (near 9) of the board', () => {
     bot.lastHitArray.push([9, 9]);
     const lastHit = bot.lastHitArray[bot.lastHitArray.length - 1];
 
@@ -52,28 +52,28 @@ describe("Test: Generates all possible valid adjacent coords", () => {
   });
 });
 
-describe("Test: Determines the direction of hit propoerly", () => {
-  test("Tests whether the direction is determined in the x-axis", () => {
+describe('Test: Determines the direction of hit propoerly', () => {
+  test('Tests whether the direction is determined in the x-axis', () => {
     bot.lastHitArray.push([4, 3]);
     bot.lastHitArray.push([3, 3]);
     const hitDirection = bot.computeHitDirection(
       bot.lastHitArray[bot.lastHitArray.length - 1],
     );
-    expect(hitDirection).toEqual("up");
+    expect(hitDirection).toEqual('up');
   });
 
-  test("Tests whether the direction is determined in the y-axis", () => {
+  test('Tests whether the direction is determined in the y-axis', () => {
     bot.lastHitArray.push([0, 0]);
     bot.lastHitArray.push([0, 1]);
     const hitDirection = bot.computeHitDirection(
       bot.lastHitArray[bot.lastHitArray.length - 1],
     );
-    expect(hitDirection).toEqual("right");
+    expect(hitDirection).toEqual('right');
   });
 });
 
-describe("Test: Initial hit is on the end of the ships", () => {
-  test("Tests whether the bot determines the direction and attacks the ship properly", () => {
+describe('Test: Initial hit is on the end of the ships', () => {
+  test('Tests whether the bot determines the direction and attacks the ship properly', () => {
     const ship = enemy.allShips[4];
     enemy.gameBoard.placeShip(ship, 0, 0);
 
@@ -89,7 +89,7 @@ describe("Test: Initial hit is on the end of the ships", () => {
     enemy.gameBoard.recieveAttack(x1, y1);
     bot.lastHitArray.push([x1, y1]);
 
-    expect(bot.hitDirection).toEqual("right");
+    expect(bot.hitDirection).toEqual('right');
 
     const [x2, y2] = bot.attack(enemy);
     enemy.gameBoard.recieveAttack(x2, y2);
@@ -106,7 +106,7 @@ describe("Test: Initial hit is on the end of the ships", () => {
     expect(ship.isSunk()).toBeTruthy();
   });
 
-  test("Tests whether the bot determines the direction and attacks the ship properly when the ship is placed near the boundary", () => {
+  test('Tests whether the bot determines the direction and attacks the ship properly when the ship is placed near the boundary', () => {
     const ship = enemy.allShips[3];
     enemy.gameBoard.placeShip(ship, 0, 0);
 
@@ -133,8 +133,8 @@ describe("Test: Initial hit is on the end of the ships", () => {
   });
 });
 
-describe("Test: Initial hit is not on the ends of the ship", () => {
-  test("Tests whether the bot flips direction and attacks the ship properly", () => {
+describe('Test: Initial hit is not on the ends of the ship', () => {
+  test('Tests whether the bot flips direction and attacks the ship properly', () => {
     const ship = enemy.allShips[3];
     enemy.gameBoard.placeShip(ship, 4, 3);
 
@@ -167,7 +167,7 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
     expect(ship.isSunk()).toBeTruthy();
   });
 
-  test("Tests whether the bot generates an proper adjacent coord when it encounters an already hit square", () => {
+  test('Tests whether the bot generates an proper adjacent coord when it encounters an already hit square', () => {
     const ship = enemy.allShips[3]; // 44 45 46 47
 
     enemy.gameBoard.placeShip(ship, 4, 4);
@@ -192,7 +192,7 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
     expect(ship.isSunk()).toBeTruthy();
   });
 
-  test("Tests whether the bot sinks the ship when it encounters 2 consecutive hit squares", () => {
+  test('Tests whether the bot sinks the ship when it encounters 2 consecutive hit squares', () => {
     const ship = enemy.allShips[4]; // 44 45 46 47 48
 
     enemy.gameBoard.placeShip(ship, 4, 4);
@@ -247,7 +247,7 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
     }
   });
 
-  test("Tests whether the bot generates a valid adjacent coord when its initial attack has no adjacent choices but a part of the ship has been attacked before", () => {
+  test('Tests whether the bot generates a valid adjacent coord when its initial attack has no adjacent choices but a part of the ship has been attacked before', () => {
     const ship = enemy.allShips[4];
     ship.changeDirection();
     enemy.gameBoard.placeShip(ship, 5, 4);
@@ -283,7 +283,7 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
     expect(ship.isSunk()).toBeTruthy();
   });
 
-  test("Test whether the bot generates valid coords when it encounters an attack near the boundary", () => {
+  test('Test whether the bot generates valid coords when it encounters an attack near the boundary', () => {
     const ship = enemy.allShips[4];
     enemy.gameBoard.placeShip(ship, 0, 0);
 
@@ -311,8 +311,8 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
   });
 });
 
-describe("Test: Tests whether the bot properly generates adjacent coords when there are nearby ships", () => {
-  test("Tests proper attack when multiple ships are present in its neighbouring cells", () => {
+describe('Test: Tests whether the bot properly generates adjacent coords when there are nearby ships', () => {
+  test('Tests proper attack when multiple ships are present in its neighbouring cells', () => {
     const shipOne = enemy.allShips[3];
     const shipTwo = enemy.allShips[2];
     const shipThree = enemy.allShips[4];
@@ -358,7 +358,7 @@ describe("Test: Tests whether the bot properly generates adjacent coords when th
       expect(shipTwo.isSunk()).toBeTruthy();
     }
   });
-  test("Test whether the direction is flipped when encountering a different ship hit", () => {
+  test('Test whether the direction is flipped when encountering a different ship hit', () => {
     const shipOne = enemy.allShips[3];
     const shipTwo = enemy.allShips[2];
 

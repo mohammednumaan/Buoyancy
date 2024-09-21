@@ -1,16 +1,16 @@
 function AiLogic() {
   const lastHitArray = [];
-  const hitDirection = "";
+  const hitDirection = '';
   const lastShip = {};
   const isSecondHit = false;
   const isFlipped = false;
-  const directions = ["up", "down", "left", "right"];
+  const directions = ['up', 'down', 'left', 'right'];
   const availableMoves = [];
 
   function attack(enemy) {
     // CASE:1 - initial attacks are on the end of the ships
     if (this.lastShip.isSunk()) {
-      this.hitDirection = "";
+      this.hitDirection = '';
       this.lastHitArray = [];
       this.isFlipped = false;
       this.lastShip = {};
@@ -31,8 +31,7 @@ function AiLogic() {
       // compute the direction of attack
 
       if (this.isSecondHit) {
-        this.hitDirection =
-          this.hitDirection || this.computeHitDirection(lastHit);
+        this.hitDirection = this.hitDirection || this.computeHitDirection(lastHit);
       }
 
       // check if the recet hit was a different hit
@@ -54,7 +53,7 @@ function AiLogic() {
             this.hitDirection = this.flipDirection(this.hitDirection);
             prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
           }
-          // if the bot encounters an already hit coord, simply move further until it 
+          // if the bot encounters an already hit coord, simply move further until it
           // finds an empty valid coord to attack
           while (enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] === true) {
             prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
@@ -74,8 +73,8 @@ function AiLogic() {
 
       // if the last his was a ship hit
       if (
-        enemy.gameBoard.boardClone[lastHit[0]][lastHit[1]] &&
-        this.isSecondHit === true
+        enemy.gameBoard.boardClone[lastHit[0]][lastHit[1]]
+        && this.isSecondHit === true
       ) {
         // generate an adjacent cell to attack
         let adjCoord = this.getAdjacentCell(lastHit, this.hitDirection);
@@ -92,10 +91,10 @@ function AiLogic() {
         }
         // if the new cell is invalid, i.e out of bounds, flip the direction of attack
         if (
-          !isValid ||
-          (!isSame &&
-            enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true) ||
-          enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false
+          !isValid
+          || (!isSame
+            && enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === true)
+          || enemy.gameBoard.boardClone[adjCoord[0]][adjCoord[1]] === false
         ) {
           this.hitDirection = this.flipDirection(this.hitDirection);
           adjCoord = this.getAdjacentCell(adjCoord, this.hitDirection);
@@ -115,8 +114,8 @@ function AiLogic() {
 
       // check if the last hit was not a ship hit
       if (
-        enemy.gameBoard.boardClone[lastHit[0]][lastHit[1]] === false &&
-        this.isSecondHit === true
+        enemy.gameBoard.boardClone[lastHit[0]][lastHit[1]] === false
+        && this.isSecondHit === true
       ) {
         // if the direction is flipped and it still is not a ship hit
         if (this.isFlipped) {
@@ -128,8 +127,8 @@ function AiLogic() {
           const isValid = this.isInBounds(adjHit);
 
           if (
-            !isValid ||
-            enemy.gameBoard.boardClone[adjHit[0]][adjHit[1]] === false
+            !isValid
+            || enemy.gameBoard.boardClone[adjHit[0]][adjHit[1]] === false
           ) {
             this.hitDirection = this.flipDirection(this.hitDirection);
             adjHit = this.getAdjacentCell(adjHit, this.hitDirection);
@@ -161,7 +160,6 @@ function AiLogic() {
 
       // if there is no adjacent cells to attack
       if (!adjacentChoices.length) {
-
         // then backtrack to retrieve previous hits on this ship
         let prevHit = this.backTrackAvailableMoves(enemy, lastHit);
         // compute the direction with the help of the back-tracked coords
@@ -173,8 +171,8 @@ function AiLogic() {
 
         // if the cooord is invalid
         if (
-          !isValid ||
-          enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] !== null
+          !isValid
+          || enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] !== null
         ) {
           // flip the direction of attack and continue to generate adjacent coords
           this.hitDirection = this.flipDirection(this.hitDirection);
@@ -204,8 +202,8 @@ function AiLogic() {
 
       const isValid = this.isInBounds(prevHit);
       if (
-        !isValid ||
-        enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] !== null
+        !isValid
+        || enemy.gameBoard.boardClone[prevHit[0]][prevHit[1]] !== null
       ) {
         this.hitDirection = this.flipDirection(this.hitDirection);
         prevHit = this.getAdjacentCell(prevHit, this.hitDirection);
@@ -226,19 +224,19 @@ function AiLogic() {
 
     /* eslint-disable-next-line default-case */
     switch (direction) {
-      case "up":
+      case 'up':
         x -= 1;
         break;
 
-      case "down":
+      case 'down':
         x += 1;
         break;
 
-      case "left":
+      case 'left':
         y -= 1;
         break;
 
-      case "right":
+      case 'right':
         y += 1;
         break;
     }
@@ -250,22 +248,22 @@ function AiLogic() {
   function flipDirection(direction) {
     /* eslint-disable-next-line default-case */
     switch (direction) {
-      case "up":
-        return "down";
+      case 'up':
+        return 'down';
 
-      case "down":
-        return "up";
+      case 'down':
+        return 'up';
 
-      case "left":
-        return "right";
+      case 'left':
+        return 'right';
 
-      case "right":
-        return "left";
+      case 'right':
+        return 'left';
     }
     this.isFlipped = true;
   }
 
-  // a simple function thath generates a list of adjacent hit choices 
+  // a simple function thath generates a list of adjacent hit choices
   // for the bot to use during its initial attacks
   function getAdjacentChoices(enemy, lasthit) {
     const choices = [];
@@ -283,7 +281,7 @@ function AiLogic() {
   function isValidAdjacentCoord(enemy, lastHit) {
     const isSameCoord = enemy.gameBoard.isSameCoord(lastHit[0], lastHit[1]);
     return isSameCoord;
-  } 
+  }
 
   // a simple function to check if the generated coords are in bounds
   function isInBounds(cell) {
@@ -297,7 +295,7 @@ function AiLogic() {
   // the difference between the hits
   function computeHitDirection(cell, backTrackedCell = null) {
     const [x, y] = cell;
-    let direction = "";
+    let direction = '';
     const xDiff = backTrackedCell
       ? x - backTrackedCell[0]
       : x - this.lastHitArray[this.lastHitArray.length - 2][0];
@@ -306,9 +304,9 @@ function AiLogic() {
       : y - this.lastHitArray[this.lastHitArray.length - 2][1];
 
     if (xDiff) {
-      direction = xDiff < 1 ? "up" : "down";
+      direction = xDiff < 1 ? 'up' : 'down';
     } else if (yDiff) {
-      direction = yDiff < 1 ? "left" : "right";
+      direction = yDiff < 1 ? 'left' : 'right';
     }
     return direction;
   }
@@ -327,7 +325,7 @@ function AiLogic() {
   }
 
   // a simple function that back-tracks available moves to attack/go-to
-  // this function is called when the bot has no adjacent hits to attack and 
+  // this function is called when the bot has no adjacent hits to attack and
   // when a part of the ship is already attacked before
   /* eslint-disable-next-line consistent-return */
   function backTrackAvailableMoves(enemy) {
@@ -351,7 +349,7 @@ function AiLogic() {
 
   // a simple function that computes the direction of attack
   // this function only runs when the bot has no adjacent coords to hit
-  // it computes by calculating the difference between the initial attack coord and 
+  // it computes by calculating the difference between the initial attack coord and
   // previouslt hit coords of the same ship
   function computeDirectionWhenBlocked(enemy, cell) {
     const coords = [];
@@ -397,8 +395,7 @@ function AiLogic() {
     isSecondHit,
     backTrackAvailableMoves,
     computeDirectionWhenBlocked,
-    isInBounds,
-    generateRandomCoords
+    generateRandomCoords,
   };
 }
 

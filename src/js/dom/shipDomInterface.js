@@ -1,103 +1,127 @@
-import Player from "../logic/player";
-import domInterface from "./domInterface";
+import Player from '../logic/player';
+import domInterface from './domInterface';
 
-const Gameboard = require("../logic/gameboard");
+const Gameboard = require('../logic/gameboard');
 
 export default class shipDomInterface {
   // an async function that controls the flow of ship plcaement
   static async placeShips(homePlayer, homeDomBoard) {
-
     // a flag variable to track ship placements
     let isAllPlaced = false;
     // retrieves elements from the dom
-    const dashboardContainer = document.querySelector(".dashboard-container");
-    const resetBtn = document.getElementById("reset-btn");
-    const randomPlacementBtn = document.getElementById("random-btn");
-    const continueBtn = document.getElementById("continue-btn");
+    const dashboardContainer = document.querySelector('.dashboard-container');
+    const resetBtn = document.getElementById('reset-btn');
+    const randomPlacementBtn = document.getElementById('random-btn');
+    const continueBtn = document.getElementById('continue-btn');
+
+    // a match media object to track the current screen's width and height
+    let mql = window.matchMedia("(max-width: 900px)");
+
 
     // check if the screen size is within the mobile range
-    if (window.innerHeight <= 879 && window.innerWidth < 500){
+    mql.onchange = async (e) => {
+      console.log(e)
+      if (e.matches){
 
-      // then, disable random placement button for ship placement
-      // this option is only available for mobile devices
-      randomPlacementBtn.style.display = 'block'
-      continueBtn.style.display = 'block'
-      continueBtn.disabled = false;
-      
-      // on click, it generates random coords for ship 
-      // placement on the users board
-      randomPlacementBtn.addEventListener('click' , () => {
-        const placedShips = document.querySelectorAll(
-          `.${homeDomBoard.className} > .placed-ship`,
-        );
-        if (placedShips){
-          // remove the placed ships from the board 
-          placedShips.forEach((ship) => ship.classList.remove("placed-ship"));
-          // replace the exisiting gameboard object with a new one
-          homePlayer.gameBoard = new Gameboard();
-        }
+        // then, disable random placement button for ship placement
+        // this option is only available for mobile devices
+        randomPlacementBtn.style.display = 'block';
+        continueBtn.style.display = 'block';
+        randomPlacementBtn.disabled = false;
+  
+  
+        // on click, it generates random coords for ship
+        // placement on the users board
+        randomPlacementBtn.addEventListener('click', () => {
+          continueBtn.disabled = false;
+          const placedShips = document.querySelectorAll(
+            `.${homeDomBoard.className} > .placed-ship`,
+          );
+          if (placedShips) {
+            // remove the placed ships from the board
+            placedShips.forEach((ship) => ship.classList.remove('placed-ship'));
+            // replace the exisiting gameboard object with a new one
+            homePlayer.gameBoard = new Gameboard();
+          }
+  
+          // place each ship randomly on the users's board
+          homePlayer.allShips.forEach((ship) => {
+            this.delgateHumanPlayerPlacement(homePlayer, ship, homeDomBoard.className);
+          });
+        });
+  
+        // wait for the user to confirm placment
+        return new Promise((resolve) => {
+          // reolves the promise and controls shifts back to the gameLogic function
+          continueBtn.onclick = () => {
+            continueBtn.disabled = true;
+            randomPlacementBtn.disabled = true;
+            resolve('All Ships Placed!');
+          }
+        });
+      } else{
 
-        // place each ship randomly on the users's board
-        homePlayer.allShips.forEach((ship) => {
-          this.delgateHumanPlayerPlacement(homePlayer, ship);
-        })
-      })
+          // else enable players to drag and drop ships on the board
+          // works for desktops and pc's
+          continueBtn.disabled =false;
+          const resetHandler = () => {
+            shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
+            resetBtn.disabled = true;
+          };
+          // create/render the ship containers for placement
+          domInterface.createShipContainers(homePlayer);
+          // event listener to handle ship placement reset
+          resetBtn.addEventListener('click', resetHandler);
+          // loop until all ships have been placed
+          while (!isAllPlaced) {
+            // check if the ship count is less than 5
+            // if true, it enables the reset button
+            resetBtn.disabled = !(
+              Array.from(dashboardContainer.children).slice(1).length < 5
+            );
       
-      // wait for the user to confirm placment
-      return await new Promise((resolve, reject) => {
-        // reolves the promise and controls shifts back to the gameLogic function
-        continueBtn.onclick = () => resolve("All Ships Placed!")
-      }) 
-      
-    } else{
-      
-      // else enable players to drag and drop ships on the board
-      // works for desktops and pc's
-      const resetHandler = () => {
-        shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
-        resetBtn.disabled = true;
-      };
-      // create/render the ship containers for placement
-      domInterface.createShipContainers(homePlayer);
-      // event listener to handle ship placement reset
-      resetBtn.addEventListener("click", resetHandler);
-      // loop until all ships have been placed
-      while (!isAllPlaced) {
-        // check if the ship count is less than 5
-        // if true, it enables the reset button
-        resetBtn.disabled = !(
-          Array.from(dashboardContainer.children).slice(1).length < 5
-        );
-        
-        // try placing the ship on the board via drag and drop
-        try {
-          await shipDomInterface.#delegateShipDrop(homePlayer, homeDomBoard);
-          isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
-        } catch (err) {
-          return err;
+            // try placing the ship on the board via drag and drop
+            try {
+              await shipDomInterface.#delegateShipDrop(homePlayer, homeDomBoard);
+              isAllPlaced = !Array.from(dashboardContainer.children).slice(1).length;
+            } catch (err) {
+              return err;
+            }
+          }
+          // disable and remove the event listener to prevent
+          // side effects in a 2-player game and to prevent resetting
+          // after all ships have been placed
+          resetBtn.disabled = true;
+          resetBtn.removeEventListener('click', resetHandler);
+          
+          
         }
       }
-      // disable and remove the event listener to prevent
-      // side effects in a 2-player game and to prevent resetting
-      // after all ships have been placed
-      resetBtn.disabled = true;
-      resetBtn.removeEventListener("click", resetHandler);
-      return Promise.resolve("All Ships Placed!");
-    }
+      
+      return new Promise((resolve) => {
+        // reolves the promise and controls shifts back to the gameLogic function
+        continueBtn.onclick = () => {
+          continueBtn.disabled = true;
+          randomPlacementBtn.disabled = true;
+          resolve('All Ships Placed!');
+        }
+      });
+
 
   }
 
   // a simple method that randomly generates coords and places ships on the given boar
-  static delgateHumanPlayerPlacement(homePlayer, currShip) {
+  /* eslint-disable-next-line consistent-return */
+  static delgateHumanPlayerPlacement(homePlayer, currShip, domBoardClass) {
     const [x, y] = Player.Player.generateRandomCoords(homePlayer);
     const directionChoice = [0, 1][Math.floor(Math.random() * [0, 1].length)];
 
     if (directionChoice) currShip.changeDirection();
     if (!homePlayer.gameBoard.isValidCoords(currShip, x, y)) {
-      return shipDomInterface.delgateHumanPlayerPlacement(homePlayer, currShip);
+      return shipDomInterface.delgateHumanPlayerPlacement(homePlayer, currShip, domBoardClass);
     }
     homePlayer.gameBoard.placeShip(currShip, x, y);
-    shipDomInterface.#markPlacedShip("player-one-board", currShip, x, y);
+    shipDomInterface.#markPlacedShip(domBoardClass, currShip, x, y);
   }
 
   // a simple method that marks a placed ship on the domboard
@@ -109,17 +133,17 @@ export default class shipDomInterface {
 
       if (!cell) return;
 
-      cell.classList.add("placed-ship");
-      if (isAi) cell.style.backgroundColor = "black";
+      cell.classList.add('placed-ship');
+      if (isAi) cell.style.backgroundColor = 'black';
     }
   }
 
   // a simple method that marks an attacked or a missed ship on the domboard
   static #attackedShipClass(cell) {
     cell.classList.add(
-      cell.classList.contains("placed-ship")
-        ? "attacked-ship"
-        : "missed-attack",
+      cell.classList.contains('placed-ship')
+        ? 'attacked-ship'
+        : 'missed-attack',
     );
   }
 
@@ -132,7 +156,7 @@ export default class shipDomInterface {
           e.target.dataset.y,
         );
 
-        if (!e.target.classList.contains("board-cell")) {
+        if (!e.target.classList.contains('board-cell')) {
           return reject(e);
         }
         if (enemyPlayer.gameBoard.recieveAttack(xCoord, yCoord)) {
@@ -146,7 +170,7 @@ export default class shipDomInterface {
       // attach click event listener that listens to the event only once
       // to avoid unintentional behaviour such as registering an attack
       // when its **not** the player's turn
-      enemyDomBoard.addEventListener("click", handleClick, { once: true });
+      enemyDomBoard.addEventListener('click', handleClick, { once: true });
     });
   }
 
@@ -172,14 +196,12 @@ export default class shipDomInterface {
       return shipDomInterface.#delgateAIPlacement(aiPlayer, currShip);
     }
     aiPlayer.gameBoard.placeShip(currShip, x, y);
-    shipDomInterface.#markPlacedShip("player-two-board", currShip, x, y, true);
+    shipDomInterface.#markPlacedShip('player-two-board', currShip, x, y, true);
   }
 
   // a simple method that places all AI's ships
   static placeAIShips(aiPlayer) {
-    aiPlayer.allShips.forEach((ship) =>
-      shipDomInterface.#delgateAIPlacement(aiPlayer, ship),
-    );
+    aiPlayer.allShips.forEach((ship) => shipDomInterface.#delgateAIPlacement(aiPlayer, ship));
   }
 
   // a simple method that attacks the enemy player's (homePlayer)
@@ -249,13 +271,13 @@ export default class shipDomInterface {
         e.preventDefault();
 
         // retrieve the dragged element's index
-        const index = e.dataTransfer.getData("application/index");
+        const index = e.dataTransfer.getData('application/index');
 
         // retrieve the corresponding shipContainer based on the retrieved index
         const shipContainer = document.querySelector(`[data-index="${index}"]`);
         const shipCells = [...shipContainer.children];
 
-        if (!e.target.classList.contains("board-cell")) return;
+        if (!e.target.classList.contains('board-cell')) return;
 
         const [x, y] = domInterface.getCellCoords(e.target);
         const currentShip = homePlayer.allShips[Number(index)];
@@ -272,7 +294,7 @@ export default class shipDomInterface {
           // retrieve the shipCell from the shipContainer and assign it [x, y] dataset coords
           shipCells[i].dataset.x = !currentShip.vertical ? x : x + i;
           shipCells[i].dataset.y = !currentShip.vertical ? y + i : y;
-          shipCells[i].classList.remove("ship-cell");
+          shipCells[i].classList.remove('ship-cell');
 
           // replace the homeDomBoard's cell with [x, y] coord with the retrieved shipCell
           cell.replaceWith(shipCells[i]);
@@ -292,10 +314,10 @@ export default class shipDomInterface {
         abortController.abort();
         resolve(e);
       };
-      homeDomBoard.addEventListener("dragover", domInterface.dragoverHandler, {
+      homeDomBoard.addEventListener('dragover', domInterface.dragoverHandler, {
         signal: abortController.signal,
       });
-      homeDomBoard.addEventListener("drop", dropHandler, {
+      homeDomBoard.addEventListener('drop', dropHandler, {
         signal: abortController.signal,
       });
     });
@@ -304,7 +326,7 @@ export default class shipDomInterface {
   // resets the board for ship placement by removing
   // existing ships and recreating the ship containers
   static #resetPlacement(homePlayer, homeDomBoard) {
-    const dashboardContainer = document.querySelector(".dashboard-container");
+    const dashboardContainer = document.querySelector('.dashboard-container');
     // retrieve all the placed ships
     const placedShips = document.querySelectorAll(
       `.${homeDomBoard.className} > .placed-ship`,
@@ -312,7 +334,7 @@ export default class shipDomInterface {
     const shipContainers = Array.from(dashboardContainer.children).slice(1);
 
     // remove the placed ships from the board and re-create the ship containers
-    placedShips.forEach((ship) => ship.classList.remove("placed-ship"));
+    placedShips.forEach((ship) => ship.classList.remove('placed-ship'));
     shipContainers.forEach((container) => container.remove());
     domInterface.createShipContainers(homePlayer);
 

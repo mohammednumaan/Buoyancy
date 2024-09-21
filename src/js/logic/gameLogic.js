@@ -1,21 +1,21 @@
 // imports
-import domInterface from "../dom/domInterface";
-import shipDomInterface from "../dom/shipDomInterface";
-import starterDOM from "../dom/starterDom";
-import Gameboard from "./gameboard";
+import domInterface from '../dom/domInterface';
+import shipDomInterface from '../dom/shipDomInterface';
+import starterDOM from '../dom/starterDom';
+import Gameboard from './gameboard';
 
-const Player = require("./player");
+const Player = require('./player');
 
-const dashboard = document.querySelector(".dashboard");
+const dashboard = document.querySelector('.dashboard');
 
-const playerOneDiv = document.querySelector(".player-one");
-const playerTwoDiv = document.querySelector(".player-two");
+const playerOneDiv = document.querySelector('.player-one');
+const playerTwoDiv = document.querySelector('.player-two');
 
-const playerOneContainer = document.querySelector(".player-one-board");
-const playerTwoContainer = document.querySelector(".player-two-board");
+const playerOneContainer = document.querySelector('.player-one-board');
+const playerTwoContainer = document.querySelector('.player-two-board');
 
-const randomPlacementBtn = document.getElementById("random-btn");
-const continueBtn = document.getElementById("continue-btn");
+const randomPlacementBtn = document.getElementById('random-btn');
+const continueBtn = document.getElementById('continue-btn');
 
 // a simple async function that handles playerOne's attack turn
 async function handlePlayerOneTurn(isAi, playerOne, playerTwo) {
@@ -25,7 +25,7 @@ async function handlePlayerOneTurn(isAi, playerOne, playerTwo) {
       playerOneContainer.childNodes,
       playerTwoContainer.childNodes,
     );
-    await domInterface.createTimeoutScreen("Attack", "Player Two");
+    await domInterface.createTimeoutScreen('Attack', 'Player Two');
     domInterface.renderBoards(playerTwoContainer, playerOneContainer);
   }
   playerOne.changeTurn(playerTwo);
@@ -40,7 +40,7 @@ async function handlePlayerTwoTurn(isAi, playerOne, playerTwo) {
       playerOneContainer.childNodes,
     );
 
-    await domInterface.createTimeoutScreen("Attack", "Player One");
+    await domInterface.createTimeoutScreen('Attack', 'Player One');
 
     domInterface.renderBoards(playerOneContainer, playerTwoContainer);
   } else {
@@ -56,12 +56,14 @@ async function handlePlayerTwoTurn(isAi, playerOne, playerTwo) {
 
 // a simple async function that handles the game's attack flow
 async function attackLogic(gameState) {
-  const { playerOne, playerTwo, isAi, gameStatus } = gameState;
+  const {
+    playerOne, playerTwo, isAi, gameStatus,
+  } = gameState;
 
   while (!gameStatus.gameover) {
     if (
-      Gameboard.allShipSunk(playerOne.allShips) ||
-      Gameboard.allShipSunk(playerTwo.allShips)
+      Gameboard.allShipSunk(playerOne.allShips)
+      || Gameboard.allShipSunk(playerTwo.allShips)
     ) {
       gameStatus.gameover = true;
       break;
@@ -88,22 +90,21 @@ async function attackLogic(gameState) {
 
 // a simple function to render the game over screen
 function openGameOverModal(winner, isAi) {
-  const modal = document.createElement("div");
-  const modalContainer = document.createElement("div");
+  const modal = document.createElement('div');
+  const modalContainer = document.createElement('div');
 
-  const h2El = document.createElement("h2");
-  const playBtn = document.createElement("button");
+  const h2El = document.createElement('h2');
+  const playBtn = document.createElement('button');
 
-  modal.className = "game-over-modal";
-  modalContainer.className = "game-over-modal-container";
-  playBtn.id = "play-again-btn";
+  modal.className = 'game-over-modal';
+  modalContainer.className = 'game-over-modal-container';
+  playBtn.id = 'play-again-btn';
 
   const timerId = setTimeout(() => {
-    h2El.textContent =
-      isAi && winner === "Player Two"
-        ? `${winner} (Ai) Wins The Battle.`
-        : `${winner} Wins The Battle.`;
-    playBtn.textContent = "Play Again?";
+    h2El.textContent = isAi && winner === 'Player Two'
+      ? `${winner} (Ai) Wins The Battle.`
+      : `${winner} Wins The Battle.`;
+    playBtn.textContent = 'Play Again?';
 
     [h2El, playBtn].forEach((el) => modalContainer.appendChild(el));
     modal.appendChild(modalContainer);
@@ -111,10 +112,10 @@ function openGameOverModal(winner, isAi) {
   }, 2000);
 
   playBtn.addEventListener(
-    "click",
+    'click',
     () => {
-      playerOneDiv.style.display = "none";
-      playerTwoDiv.style.display = "none";
+      playerOneDiv.style.display = 'none';
+      playerTwoDiv.style.display = 'none';
 
       playerOneContainer.replaceChildren();
       playerTwoContainer.replaceChildren();
@@ -136,26 +137,26 @@ export default async function gameLogic(isAi) {
   // initialize playerOne's boards and wait for ship placement
   domInterface.createBoards(playerOneContainer);
   await shipDomInterface.placeShips(playerOne, playerOneContainer);
-  randomPlacementBtn.style.display = "none";
-  continueBtn.style.display = "none";
 
   if (!isAi) {
-    await domInterface.createTimeoutScreen("Place Ships", "Player Two");
+    await domInterface.createTimeoutScreen('Place Ships', 'Player Two');
+    randomPlacementBtn.style.display = 'none';
+    continueBtn.style.display = 'none';
 
-    playerOneDiv.style.display = "none";
-    playerTwoDiv.style.display = "block";
+    playerOneDiv.style.display = 'none';
+    playerTwoDiv.style.display = 'block';
 
     // initialize playerTwo's boards and wait for ship placement
     domInterface.createBoards(playerTwoContainer);
     await shipDomInterface.placeShips(playerTwo, playerTwoContainer);
-    randomPlacementBtn.style.display = "none";
-    continueBtn.style.display = "none";
 
-    await domInterface.createTimeoutScreen("Begin The Battle!", "Player One");
-    dashboard.style.display = "none";
+    await domInterface.createTimeoutScreen('Begin The Battle!', 'Player One');
+    dashboard.style.display = 'none';
+    randomPlacementBtn.style.display = 'none';
+    continueBtn.style.display = 'none';
 
     // display both the gameboards and start the game
-    playerOneDiv.style.display = "block";
+    playerOneDiv.style.display = 'block';
     domInterface.renderBoards(playerOneContainer, playerTwoContainer);
     await attackLogic({
       playerOne,
@@ -165,16 +166,18 @@ export default async function gameLogic(isAi) {
     });
   } else {
     await domInterface.createTimeoutScreen(
-      "Begin The Battle!",
-      "Click Continue",
+      'Begin The Battle!',
+      'Click Continue',
       true,
       100,
     );
+    randomPlacementBtn.style.display = 'none';
+    continueBtn.style.display = 'none';
     domInterface.createBoards(playerTwoContainer);
     shipDomInterface.placeAIShips(playerTwo);
 
-    playerTwoDiv.style.display = "block";
-    dashboard.style.display = "none";
+    playerTwoDiv.style.display = 'block';
+    dashboard.style.display = 'none';
     domInterface.renderBoards(playerOneContainer, playerTwoContainer);
     await attackLogic({
       playerOne,
@@ -186,7 +189,7 @@ export default async function gameLogic(isAi) {
 
   if (gameStatus.gameover) {
     const winner = (gameStatus.turns % 2) - 1;
-    if (winner !== 0) openGameOverModal("Player One", isAi);
-    else openGameOverModal("Player Two", isAi);
+    if (winner !== 0) openGameOverModal('Player One', isAi);
+    else openGameOverModal('Player Two', isAi);
   }
 }

@@ -1,23 +1,23 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: {
-    app: './src/index.js',
+    app: "./src/index.js",
   },
 
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Buoyancy',
-      template: '/src/html/index.template.html',
+      title: "Buoyancy",
+      template: "/src/html/index.template.html",
     }),
   ],
 
-  devtool: 'false',
+  devtool: "false",
 
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: "bundle.js",
+    path: path.resolve(__dirname, "dist"),
     clean: true,
   },
 
@@ -25,19 +25,19 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
+        type: "asset/resource",
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
+        type: "asset/resource",
       },
       {
         test: /\.html$/i,
-        loader: 'html-loader',
+        loader: "html-loader",
       },
     ],
   },

@@ -94,7 +94,7 @@ button:disabled{
     padding: 10px;
     padding-left: 20px;
     border: 2px solid var(--color);
-    /* border-radius: 10px; */
+    border-radius: 10px;
     overflow-y: auto;
 }
 
@@ -127,6 +127,7 @@ button:disabled{
     flex-direction: row;
     width: fit-content;
     margin-left: 2vh;
+    margin-bottom: 10px;
 }
 
 .ship-cell{
@@ -155,8 +156,14 @@ button:disabled{
 
     padding: 40px;
     margin-top: 10vh;
+ 
+}
 
-    
+.no-ships-message{
+    display: none;
+    color: #957eff;
+    text-align: center;
+    margin-top: 50%;
 }
 
 .player-two{
@@ -294,7 +301,7 @@ button:disabled{
   }
 
 /* STYLE PROPERTIES FOR DEVICES UPTO A WIDTH OF 600px */
-@media (max-width: 1024px) {
+@media (max-width: 1120px) {
 
     body {
         font-size: 14px;
@@ -338,6 +345,7 @@ button:disabled{
         /* width: 100%;/ */
         height: auto;
         margin-top: 5vh;
+        gap: 16px;
     }
 
     .board-container {
@@ -364,9 +372,6 @@ button:disabled{
         height: 25px;
     }
 
-    .ship-container {
-        flex-direction: column;
-    }
 
     #reset-btn,
     #play-again-btn {

@@ -1,6 +1,6 @@
-const AiLogic = require('./AiLogic');
-const Gameboard = require('./gameboard');
-const Ship = require('./ship');
+const AiLogic = require("./AiLogic");
+const Gameboard = require("./gameboard");
+const Ship = require("./ship");
 
 class Player {
   constructor(turn, isAi = false) {

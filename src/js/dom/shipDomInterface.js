@@ -106,6 +106,8 @@ export default class shipDomInterface {
         if (!placedShipEl.length) {
           domInterface.createShipContainers(homePlayer);
           dashboardContainer.children[1].style.display = "none";
+          continueBtn.disabled = true;
+
         } else {
           // check if all the ships are placed on the board
           // this runs when a (tablet/mobile) device is oriented horizontally
@@ -118,6 +120,7 @@ export default class shipDomInterface {
             ).slice(2);
             shipContainers.forEach((container) => container.remove());
             dashboardContainer.children[1].style.display = "block";
+            continueBtn.disabled = false;
           }
 
           dashboardContainer.style.display = "block";
@@ -129,13 +132,13 @@ export default class shipDomInterface {
           // check if the ship count is less than 5
           // if true, it enables the reset button
           resetBtn.disabled = !(
-            Array.from(dashboardContainer.children).slice(1).length < 5
+            Array.from(dashboardContainer.children).slice(2).length < 5
           );
 
           // try placing the ship on the board via drag and drop
           try {
             await shipDomInterface.#delegateShipDrop(homePlayer, homeDomBoard);
-            isAllPlaced = !Array.from(dashboardContainer.children).slice(1)
+            isAllPlaced = !Array.from(dashboardContainer.children).slice(2)
               .length;
           } catch (err) {
             return err;
@@ -144,7 +147,7 @@ export default class shipDomInterface {
         // disable and remove the event listener to prevent
         // side effects in a 2-player game and to prevent resetting
         // after all ships have been placed
-        // resetBtn.disabled = true;
+        resetBtn.disabled = true;
         continueBtn.disabled = false;
         resetBtn.removeEventListener("click", resetHandler);
       }

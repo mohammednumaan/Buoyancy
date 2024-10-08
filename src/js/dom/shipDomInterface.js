@@ -107,7 +107,6 @@ export default class shipDomInterface {
           domInterface.createShipContainers(homePlayer);
           dashboardContainer.children[1].style.display = "none";
           continueBtn.disabled = true;
-
         } else {
           // check if all the ships are placed on the board
           // this runs when a (tablet/mobile) device is oriented horizontally

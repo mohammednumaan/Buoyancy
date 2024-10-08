@@ -11,7 +11,7 @@ Battleship is a two-player strategy game where players place their ships on thei
 - Designed an interactive and responsive User Interface.
 - Implemented Drag-Drop to place ships on the board (for Desktop devices).
 - Ability to play with both a Human player and an AI player.
-- Designed an algorithm to allow the Bot/AI to make smarter moves on the board. [View More Details](##the-bot-algorithm).
+- Designed an algorithm to allow the Bot/AI to make smarter moves on the board. [View More Details](#the-bot-algorithm).
 
 ## Tests
 
@@ -40,7 +40,7 @@ In this phase, the bot generates a random valid coordinate.
 
 The bot then proceeds to attack the user's board with the generated coordinate.
 
-This phase continues until the bot **hits** a ship on the board. ([Attack Phase](###attack-phase)).
+This phase continues until the bot **hits** a ship on the board. ([Attack Phase](#attack-phase)).
 
 ## Attack Phase
 
@@ -98,7 +98,7 @@ I hope this sections gives a very brief overview of how the algorithm works. The
 
 ### Fonts
 - The font used in the project is called **Söhne**, which can be downloaded [here](https://befonts.com/sohne-font-family.html#google_vignette).
-- For more details about the font, [visit here](https://klim.co.nz/retail-fonts/soehne/).
+- For more details about the font, visit [here](https://klim.co.nz/retail-fonts/soehne/).
 
 ## Icons
 - The browser tab icon for this project can be found [here](https://icons8.com/icons/set/sailing--purple).

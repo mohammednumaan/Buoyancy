@@ -18,16 +18,19 @@ Battleship is a two-player strategy game where players place their ships on thei
 This project utilizes the *Jest Testing Framework* to perform **Unit Tests** on critical game components. The test files can be found [here](https://github.com/mohammednumaan/Buoyancy/tree/main/src/tests).
 
 #### Ship Module Tests
-![Ship_Tests](image.png)
+![Ship_Tests](./screenshots/test-4.png)
 
 #### Player Module Tests
-![Player_Tests](image-1.png)
+![Player_Tests](./screenshots/test-1.png)
 
 #### Gameboard Module Tests
-![Gameboard_Tests](image-2.png)
+![Gameboard_Tests](./screenshots/test-2.png)
 
 #### Ai Logic Module Tests
-![AiLogic_Tests](image-3.png)
+![AiLogic_Tests](./screenshots/test-3.png)
+
+#### Overall Test Result
+![Overall_Test_Result](./screenshots/test-result.png)
 
 ## The Bot Algorithm
 

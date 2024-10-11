@@ -1,11 +1,13 @@
+/* FONT STYLE DEFINITION */
 @font-face {
     font-family: 'poppins';
     src: url('../assets/sohne.otf');
 }
 
+/* HTML ELEMENTS STYLING */
 :root{
     --color: #9e88fd;
-    --place: #957eff    ;
+    --place: #957eff;
 }
 
 body{
@@ -44,12 +46,13 @@ button:disabled{
 
 }
 
-
+/* HEADER STYLING */
 .header{
     text-align: center;
     color: var(--color);
 }
 
+/* FOOTER STYLING  */
 .footer{
 
     position: absolute;
@@ -69,12 +72,14 @@ button:disabled{
     
 }
 
+/* GAME CONTAINER STYLING */
 .game-container{
     display: flex;
     justify-content: center ;
     align-items: center;
 }
 
+/* DASHBOARD CONTAINER STYLING */
 .dashboard{
     display: none;
     flex-direction: column;
@@ -98,23 +103,6 @@ button:disabled{
     overflow-y: auto;
 }
 
-/* width */
-::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px #78719f;
-    border-radius: 6px;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: #d9d4ff;
-    border-radius: 6px;
-  }
-
 .dashboard-container > h4{
     display: flex;
     justify-content: center;
@@ -130,10 +118,6 @@ button:disabled{
     margin-bottom: 10px;
 }
 
-.ship-cell{
-    background-color: #957eff;
-}
-
 #reset-btn,
 #random-btn,
 #continue-btn{
@@ -147,7 +131,29 @@ button:disabled{
     display: none;
 }
 
+.ship-cell{
+    background-color: #957eff;
+}
 
+
+/* SCROLLBAR STYLING */
+::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #78719f;
+    border-radius: 6px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #d9d4ff;
+    border-radius: 6px;
+  }
+
+
+
+/* BOARD CONTAINER STYLING */
 .board-container{
     display: flex;
     justify-content: center;
@@ -159,24 +165,6 @@ button:disabled{
  
 }
 
-.no-ships-message{
-    display: none;
-    color: #957eff;
-    text-align: center;
-    margin-top: 50%;
-}
-
-.player-two{
-    display: none;
-}
-
-.player-one > h4,
-.player-two > h4{
-    text-align: center;
-    clear: left;
-    color: var(--color);
-}
-
 .player-one-board,
 .player-two-board{
     display: grid;
@@ -186,8 +174,19 @@ button:disabled{
     border: 6px solid var(--color);
 }
 
+.player-two{
+    display: none;
+}
+
 .player-two-board{
     margin-right: 0;
+}
+
+.player-one > h4,
+.player-two > h4{
+    text-align: center;
+    clear: left;
+    color: var(--color);
 }
 
 .board-cell{
@@ -195,11 +194,26 @@ button:disabled{
     height: 38px;
     border: 1px solid var(--color);
 }
+.no-ships-message{
+    display: none;
+    color: #957eff;
+    text-align: center;
+    margin-top: 50%;
+}
 
 .placed-ship{
     background-color: var(--place);
 }
 
+.attacked-ship{
+    background-color: red;
+}
+
+.missed-attack{
+    background-color: #3130d2;
+}
+
+/* TIMEOUT SCREEN STYLING */
 .timeout-screen{
     display: none;
     justify-content: center;
@@ -215,23 +229,14 @@ button:disabled{
     left: 0;
 
     backdrop-filter: blur(100px);
-
 }
 
 #continue-game-btn{
     width: 23vh;
     height: 30px;
-
 }
 
-.attacked-ship{
-    background-color: red;
-}
-
-.missed-attack{
-    background-color: #3130d2;
-}
-
+/* STARTER MENU SCREEN STYLING */
 .starter-screen{
     display: flex;
     justify-content: center;
@@ -247,16 +252,17 @@ button:disabled{
     color: #9e88fd;
 }   
 
-.game-mode-buttons > button{
-    width: 290px;
-    height: 30px;
-}
-
 .game-mode-buttons{
     display: flex;
     gap: 20px;
 }
 
+.game-mode-buttons > button{
+    width: 290px;
+    height: 30px;
+}
+
+/* GAME OVER MODAL STYLING */
 .game-over-modal{
     display: flex;
     justify-content: center;
@@ -280,16 +286,17 @@ button:disabled{
     flex-direction: column;
 }
 
+
 #play-again-btn{
     width: 24vh;
     height: 25px;
 }
 
+
+/* GITHUB ICON STYLING (FOOTER) */
 #github-icon:hover{
     animation: rotateIcon 1s ease-in-out;
 }
-
-
 
 @keyframes rotateIcon {
 
@@ -300,13 +307,17 @@ button:disabled{
 
   }
 
-/* STYLE PROPERTIES FOR DEVICES UPTO A WIDTH OF 600px */
+
+
+/* STYLE PROPERTIES FOR DEVICES UPTO A WIDTH OF 1120px */
 @media (max-width: 1120px) {
 
+    /* BODY STYLING */
     body {
         font-size: 14px;
     }
 
+    /* HEADER AND FOOTER STYLING */
     .header{
         text-align: center;
         color: var(--color);
@@ -317,6 +328,12 @@ button:disabled{
         top: 114%;
 
     }
+
+    /* STARTER MENU SCREEN STYLING */
+    .starter-screen {
+        margin-top: 10vh;
+    }
+
     .starter-screen-container{
         margin-top: 26%;
     }
@@ -331,7 +348,18 @@ button:disabled{
         width: 70%;
     }
 
+    .game-mode-buttons > button {
+        width: 100%;
+    }
 
+    /* DASHBOARD CONTAINER STYLING */
+    .dashboard-container {
+        height: auto;
+        margin-top: 5vh;
+        gap: 16px;
+    }
+    
+    /* GAME AND BOARD CONTAINER STYLING */
     .game-container {
         display: flex;
         justify-content: center;
@@ -341,12 +369,6 @@ button:disabled{
         margin-bottom: 100px;
     }
 
-    .dashboard-container {
-        /* width: 100%;/ */
-        height: auto;
-        margin-top: 5vh;
-        gap: 16px;
-    }
 
     .board-container {
         display: flex;
@@ -372,7 +394,17 @@ button:disabled{
         height: 25px;
     }
 
+    /* GAME OVER MODAL STYLING */
+    .game-over-modal {
+        padding: 10px;
+    }
 
+    /* TIMEOUT SCREEN STYLING */
+    .timeout-screen{
+        height: 110%;
+    }
+
+    /* BUTTON STYLING */
     #reset-btn,
     #play-again-btn {
         width: 112%;
@@ -384,21 +416,5 @@ button:disabled{
     #continue-btn{
         width: 100%;
         margin: auto;
-    }
-
-    .game-mode-buttons > button {
-        width: 100%;
-    }
-
-    .starter-screen {
-        margin-top: 10vh;
-    }
-
-    .game-over-modal {
-        padding: 10px;
-    }
-
-    .timeout-screen{
-        height: 110%;
     }
 }

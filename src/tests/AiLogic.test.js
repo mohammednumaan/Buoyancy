@@ -1,14 +1,18 @@
+// imports
 const AiLogic = require("../js/logic/AiLogic");
 const { Player } = require("../js/logic/player");
 
+// initializing objects
 let bot = AiLogic();
 let enemy = new Player(false, false);
 
+// helper functions to perform setup and teardown
 beforeEach(() => {
   bot = AiLogic();
   enemy = new Player(false, true);
 });
 
+// TEST: Proper functioning of the computeHitDirection method (along with edge cases)
 describe("Test: Generates all possible valid adjacent coords", () => {
   test("Tests whether valid coords are being generated for an attack in the middle of the board", () => {
     bot.lastHitArray.push([4, 5]);
@@ -52,6 +56,7 @@ describe("Test: Generates all possible valid adjacent coords", () => {
   });
 });
 
+// TEST: Proper functioning of the computeHitDirection method
 describe("Test: Determines the direction of hit propoerly", () => {
   test("Tests whether the direction is determined in the x-axis", () => {
     bot.lastHitArray.push([4, 3]);
@@ -72,6 +77,7 @@ describe("Test: Determines the direction of hit propoerly", () => {
   });
 });
 
+// TEST: Tests CASE_01 - Initial hits are at the ends of the ship (along with edge cases)
 describe("Test: Initial hit is on the end of the ships", () => {
   test("Tests whether the bot determines the direction and attacks the ship properly", () => {
     const ship = enemy.allShips[4];
@@ -133,6 +139,7 @@ describe("Test: Initial hit is on the end of the ships", () => {
   });
 });
 
+// TEST: Tests CASE_02 - Initial hit is not at the ends of the ship (along with edge cases)
 describe("Test: Initial hit is not on the ends of the ship", () => {
   test("Tests whether the bot flips direction and attacks the ship properly", () => {
     const ship = enemy.allShips[3];
@@ -168,7 +175,7 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
   });
 
   test("Tests whether the bot generates an proper adjacent coord when it encounters an already hit square", () => {
-    const ship = enemy.allShips[3]; // 44 45 46 47
+    const ship = enemy.allShips[3];
 
     enemy.gameBoard.placeShip(ship, 4, 4);
 
@@ -193,7 +200,7 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
   });
 
   test("Tests whether the bot sinks the ship when it encounters 2 consecutive hit squares", () => {
-    const ship = enemy.allShips[4]; // 44 45 46 47 48
+    const ship = enemy.allShips[4];
 
     enemy.gameBoard.placeShip(ship, 4, 4);
 
@@ -278,8 +285,6 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
     enemy.gameBoard.recieveAttack(x3, y3);
     bot.lastHitArray.push([x3, y3]);
 
-    // const [x4, y4] = bot.attack(enemy)
-    // enemy.gameBoard.recieveAttack(x4, y4)
     expect(ship.isSunk()).toBeTruthy();
   });
 
@@ -311,6 +316,8 @@ describe("Test: Initial hit is not on the ends of the ship", () => {
   });
 });
 
+// TEST: Tests CASE_03 - The bot encounters a cell of the same ship
+// which was already attacked (along with edge cases)
 describe("Test: Tests whether the bot properly generates adjacent coords when there are nearby ships", () => {
   test("Tests proper attack when multiple ships are present in its neighbouring cells", () => {
     const shipOne = enemy.allShips[3];

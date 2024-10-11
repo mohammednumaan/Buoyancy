@@ -1,11 +1,14 @@
+// imports
 const Gameboard = require("../js/logic/gameboard");
 const Ship = require("../js/logic/ship");
 
+// declaring variables
 let gameBoard;
 let allShips;
 let shipOne;
 let shipTwo;
 
+// helper functions to perform setup and teardown
 beforeEach(() => {
   gameBoard = new Gameboard();
   allShips = Ship.createShips();
@@ -18,6 +21,7 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
+// TEST: Proper functioning of the isValidCoord method
 describe("Test: Valid coordinates for ship placement", () => {
   test("Check if the ship coordinates are valid in the horizontal direction", () => {
     expect(gameBoard.isValidCoords(shipOne, 0, 0)).toBe(true);
@@ -32,6 +36,7 @@ describe("Test: Valid coordinates for ship placement", () => {
   });
 });
 
+// TEST: Proper functioning of the placeShip method
 describe("Test: Placement of Ships on the Gameboard", () => {
   test("Check if ship placement is valid in the horizontal direction", () => {
     const isValidFunc = jest.spyOn(gameBoard, "isValidCoords");
@@ -59,6 +64,7 @@ describe("Test: Placement of Ships on the Gameboard", () => {
   });
 });
 
+// TEST: Proper functioning of the recieveAttack method
 describe("Test: Attack Ships on the Gameboard", () => {
   test("Check if ships recieve attack", () => {
     const spyHitFunc = jest.spyOn(shipOne, "hit");
@@ -76,6 +82,7 @@ describe("Test: Attack Ships on the Gameboard", () => {
   });
 });
 
+// TEST: Proper functioning of the allShipSunk method
 describe("Test: All ships are sunk", () => {
   test("Return false if all ships are not sunk", () => {
     gameBoard.placeShip(shipOne, 0, 0);

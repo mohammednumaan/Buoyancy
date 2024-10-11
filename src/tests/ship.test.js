@@ -1,7 +1,11 @@
+// imports
 const Ship = require("../js/logic/ship");
 
+// declaring variables
 let shipOne;
 let shipTwo;
+
+// helper functions to perform setup and teardown
 beforeEach(() => {
   [shipOne, shipTwo] = Ship.createShips();
 });
@@ -11,6 +15,7 @@ afterEach(() => {
   shipTwo.hits = 0;
 });
 
+// TEST: Proper initialization of ship objects
 test("Check if Ship Object is Initialized Properly", () => {
   expect(shipOne).toHaveProperty("length", 2);
   expect(shipOne).toHaveProperty("hits", 0);
@@ -21,6 +26,7 @@ test("Check if Ship Object is Initialized Properly", () => {
   expect(shipTwo).toHaveProperty("vertical", false);
 });
 
+// TEST: Proper functioning of the changeDirection method
 test("Check if Ship Object can change direction", () => {
   shipOne.changeDirection();
   expect(shipOne.vertical).toBe(true);
@@ -29,6 +35,7 @@ test("Check if Ship Object can change direction", () => {
   expect(shipOne.vertical).toBe(false);
 });
 
+// TEST: Proper functioning of the hit method
 test("Check if Ship Object Is Hit Properly", () => {
   shipOne.hit();
   shipOne.hit();
@@ -39,6 +46,7 @@ test("Check if Ship Object Is Hit Properly", () => {
   expect(shipTwo.hits).toBe(2);
 });
 
+// TEST: Proper functioning of the isSunk method
 test("Check if Ship Object is Sunk", () => {
   shipOne.hit();
   shipOne.hit();

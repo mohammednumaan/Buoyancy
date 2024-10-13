@@ -1,7 +1,7 @@
 # Buoyancy: A Strategic Naval Warfare Game.
 ![Buoyancy_Game_Title](./screenshots/image.png)
 
-Battleship is a two-player strategy game where players place their ships on their respective boards. Players take turns guessing the coordinates of the opponent's ships, aiming to "hit" and sink them all. The first player to sink all of the opponent's ships wins the game.
+Buoyancy is a two-player strategy game where players place their ships on their respective boards. Players take turns guessing the coordinates of the opponent's ships, aiming to "hit" and sink them all. The first player to sink all of the opponent's ships wins the game.
 
 ![Buoyancy_Game_Demo_Screenshot](./screenshots/image-1.png)
 
@@ -114,7 +114,7 @@ All the assets can also be found [here](https://github.com/mohammednumaan/Buoyan
 
 This project is a **major refactor** of the previous version of this game. The changes include: 
 
-- New User Interface (responsive) and Color Theme.
+- New User Interface (responsive) and Color Theme. (Some viewports are not supported. This might cause the UI to break, i.e not *completely responsive*).
 - The entire `gameLogic` module and the core `DOM` functionalties implemented are asynchronous.
 - Implemented features that allows a player to play a 2-player game with a person or with a smart AI/bot.
 

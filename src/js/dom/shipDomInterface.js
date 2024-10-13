@@ -19,6 +19,15 @@ export default class shipDomInterface {
     /// initialize a resize observer to track the change in dimensions
     const mql = matchMedia("(max-width: 1120px)");
 
+    // an event handler to handle ship placement resets
+    const resetHandler = () => {
+      shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
+      domInterface.createShipContainers(homePlayer);
+      continueBtn.disabled = true;
+      resetBtn.disabled = true;
+      dashboardContainer.children[1].style.display = "none";
+    };
+
     // check if the screen size is within the mobile range
     /* eslint-disable consistent-return */
     async function shipPlacementObserver(e) {
@@ -41,11 +50,13 @@ export default class shipDomInterface {
         resetBtn.style.display = "none";
         dashboardContainer.style.display = "none";
 
-        // if (!document.querySelectorAll(
-        //   `.${homeDomBoard.className} > .placed-ship`,
-        // ).length) {
-        //   shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
-        // }
+        // resets the ship placement when the device viewport is changed to avoid
+        // duplication of ship containers when changing back to the original viewport
+        if (!document.querySelectorAll(
+          `.${homeDomBoard.className} > .placed-ship`,
+        ).length) {
+          shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
+        }
 
         // on click, it generates random coords for ship
         // placement on the users board
@@ -87,15 +98,6 @@ export default class shipDomInterface {
 
         randomPlacementBtn.disabled = true;
 
-        // an event handler to handle ship placement resets
-        const resetHandler = () => {
-          shipDomInterface.#resetPlacement(homePlayer, homeDomBoard);
-          domInterface.createShipContainers(homePlayer);
-          continueBtn.disabled = true;
-          resetBtn.disabled = true;
-          dashboardContainer.children[1].style.display = "none";
-        };
-
         // retrieve the placed ships from the dom
         const placedShipEl = document.querySelectorAll(
           `.${homeDomBoard.className} > .placed-ship`,
@@ -128,6 +130,7 @@ export default class shipDomInterface {
         resetBtn.addEventListener("click", resetHandler);
         // loop until all ships have been placed
         while (!isAllPlaced) {
+          console.log('hi')
           // check if the ship count is less than 5
           // if true, it enables the reset button
           resetBtn.disabled = !(
@@ -140,15 +143,14 @@ export default class shipDomInterface {
             isAllPlaced = !Array.from(dashboardContainer.children).slice(2)
               .length;
           } catch (err) {
-            return err;
+            // if the promise is rejected, simply continue the loop
+            // to let the user have another attempt in placing the ship
           }
         }
         // disable and remove the event listener to prevent
         // side effects in a 2-player game and to prevent resetting
         // after all ships have been placed
-        resetBtn.disabled = true;
         continueBtn.disabled = false;
-        resetBtn.removeEventListener("click", resetHandler);
       }
     }
 
@@ -159,8 +161,10 @@ export default class shipDomInterface {
     return new Promise((resolve) => {
       // reolves the promise and controls shifts back to the gameLogic function
       continueBtn.onclick = () => {
+        resetBtn.disabled = true;
         continueBtn.disabled = true;
         randomPlacementBtn.disabled = true;
+        resetBtn.removeEventListener("click", resetHandler);
         mql.removeEventListener("change", shipPlacementObserver);
         resolve("All Ships Placed!");
       };
@@ -329,23 +333,43 @@ export default class shipDomInterface {
     // create an abort controller to handle removal of event listeners
     const abortController = new AbortController();
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const dropHandler = (e) => {
         e.preventDefault();
 
         // retrieve the dragged element's index
         const index = e.dataTransfer.getData("application/index");
 
+        // if the dragged element is not the required index element
+        // reject the promise and abort the event. 
+        // this situation occurs when the user copies a text and attempts
+        // to drag it. if not handled, it will throw a type error
+        if (index == ""){
+          abortController.abort();
+          e.stopImmediatePropagation();
+          return reject(e);
+        }
+
         // retrieve the corresponding shipContainer based on the retrieved index
         const shipContainer = document.querySelector(`[data-index="${index}"]`);
+        // if (!shipContainer) return reject(e);
+
         const shipCells = [...shipContainer.children];
 
-        if (!e.target.classList.contains("board-cell")) return;
+        if (!e.target.classList.contains("board-cell")) {
+          abortController.abort();
+          e.stopImmediatePropagation();
+          return reject(e);
+        }
 
         const [x, y] = domInterface.getCellCoords(e.target);
         const currentShip = homePlayer.allShips[Number(index)];
 
-        if (!homePlayer.gameBoard.isValidCoords(currentShip, x, y)) return;
+        if (!homePlayer.gameBoard.isValidCoords(currentShip, x, y)){
+            abortController.abort();
+            e.stopImmediatePropagation();
+            return reject(e);
+        }
 
         // if the selected drop coords is valid, begin placing the ship
         for (let i = 0; i < currentShip.length; i += 1) {

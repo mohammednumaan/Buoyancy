@@ -58,7 +58,7 @@ button:disabled{
     position: absolute;
     z-index: -1;
     color: var(--color);
-    bottom: 20px;
+    bottom: 0;
 
     left: 0; 
     right: 0; 
@@ -99,7 +99,7 @@ button:disabled{
     padding: 10px;
     padding-left: 20px;
     border: 2px solid var(--color);
-    border-radius: 10px;
+    border-radius: 6px;
     overflow-y: auto;
 }
 
@@ -184,6 +184,7 @@ button:disabled{
 
 .player-one > h4,
 .player-two > h4{
+    width: 94%;
     text-align: center;
     clear: left;
     color: var(--color);
@@ -327,7 +328,7 @@ button:disabled{
     .footer {
         position: absolute;
         z-index: 1;
-        bottom: -50vh;
+        bottom: -20vh;
         width: 100%;
     }
     /* STARTER MENU SCREEN STYLING */
@@ -385,6 +386,14 @@ button:disabled{
         margin-bottom: 5vh;text-align: center;
     }
 
+    .player-one > h4,
+    .player-two > h4{
+        width: 100%;
+        text-align: center;
+        clear: left;
+        color: var(--color);
+    }
+
 
     .board-cell {
         width: 25px;
@@ -397,6 +406,10 @@ button:disabled{
     }
 
     /* BUTTON STYLING */
+    #continue-game-btn{
+        width: 20vw;
+    }
+
     #reset-btn,
     #play-again-btn {
         width: 112%;
@@ -419,3 +432,19 @@ button:disabled{
         bottom: -100px;
     }
 }
+
+@media (min-height: 300px) and (max-width: 800px){
+    .footer{
+        position: relative;
+        bottom: -100px;
+    }
+}
+
+@media (max-width: 1200px){
+    .footer{
+        position: relative;
+        bottom: -50vh;
+    }
+}
+
+

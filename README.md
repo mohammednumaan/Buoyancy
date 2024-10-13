@@ -94,7 +94,7 @@ If it doesn't find in that particular direction, it simply **flips** the directi
 
 ### Final Note
 
-I hope this sections gives a very brief overview of how the algorithm works. There are a few more cases (`extension of case 3`) that is not covered in this section (this shouldn't matter a lot for now, since its an extension of `case-3`). To view the source code click (here)[!](https://github.com/mohammednumaan/Buoyancy/blob/main/src/js/logic/AiLogic.js).
+I hope this sections gives a very brief overview of how the algorithm works. There are a few more cases (`extension of case 3`) that is not covered in this section (this shouldn't matter a lot for now, since its an extension of `case-3`). To view the source code click [here](https://github.com/mohammednumaan/Buoyancy/blob/main/src/js/logic/AiLogic.js).
 
 
 ## Assets

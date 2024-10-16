@@ -17,7 +17,7 @@ export default class shipDomInterface {
     const continueBtn = document.getElementById("continue-btn");
 
     /// initialize a resize observer to track the change in dimensions
-    const mql = matchMedia("(max-width: 1120px)");
+    const mql = matchMedia("(max-width: 1200px)");
 
     // an event handler to handle ship placement resets
     const resetHandler = () => {
@@ -48,6 +48,7 @@ export default class shipDomInterface {
         // hide other options (such as dashboard container)
         // that aren't required for tablet and mobile devices
         resetBtn.style.display = "none";
+        dashboard.style.display = "none"
         dashboardContainer.style.display = "none";
 
         // resets the ship placement when the device viewport is changed to avoid
@@ -124,6 +125,7 @@ export default class shipDomInterface {
             continueBtn.disabled = false;
           }
 
+          dashboard.style.display = "block"
           dashboardContainer.style.display = "block";
         }
         // event listener to handle ship placement reset

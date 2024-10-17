@@ -114,7 +114,7 @@ All the assets can also be found [here](https://github.com/mohammednumaan/Buoyan
 
 This project is a **major refactor** of the previous version of this game. The changes include: 
 
-- New User Interface (responsive) and Color Theme. (Some viewports are not supported. This might cause the UI to break, i.e not *completely responsive*).
+- New User Interface (responsive) and Color Theme. (Some viewports might have minor alignment issues).
 - The entire `gameLogic` module and the core `DOM` functionalties implemented are asynchronous.
 - Implemented features that allows a player to play a 2-player game with a person or with a smart AI/bot.
 

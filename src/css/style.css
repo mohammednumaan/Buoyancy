@@ -442,10 +442,6 @@ button:disabled{
         border: 6px solid var(--color);
     }
 
-    .dashboard{
-        /* width: 400px; */
-    }
-
     .ship-container > .board-cell{
         width: 48px;
         height: 48px;

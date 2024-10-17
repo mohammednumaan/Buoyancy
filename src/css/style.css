@@ -57,18 +57,18 @@ button:disabled{
 .footer{
 
     position: relative;
-    z-index: -1;
     color: var(--color);
-    top:45ch;
+    top: 40ch;
 
     left: 0; 
     right: 0; 
+    z-index: -1;
     margin-inline: auto; 
     width: fit-content;
 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center;    
     gap: 10px;
     
 }
@@ -78,32 +78,33 @@ button:disabled{
     display: flex;
     justify-content: center ;
     align-items: center;
-    /* flex: 1;  */
 }
 
 /* DASHBOARD CONTAINER STYLING */
 .dashboard{
     display: none;
     flex-direction: column;
-    gap: 20px;
+    justify-content: center;
+    gap: 10px;
 
-    height: 410px;
-    width: 300px;
-    margin-top: 7vh;
+    width: auto;
+    margin-top: 1%;
     margin-right: 100px;
 }
 
 .dashboard-container{
     display: none;
     flex-direction: column;
-    gap: 16px;
-    
-    height: 100%;
+    gap: 10px;
+
+    height: 18em;
     padding: 10px;
     padding-left: 20px;
     border: 2px solid var(--color);
     border-radius: 6px;
     overflow-y: auto;
+    margin-bottom: 20px;
+    margin-top: 2vh;
 }
 
 
@@ -118,7 +119,7 @@ button:disabled{
     display: flex;
     flex-direction: row;
     width: fit-content;
-    margin-left: 2vh;
+    /* margin-left: 2vh; */
     margin-bottom: 10px;
 }
 
@@ -130,9 +131,10 @@ button:disabled{
 #reset-btn,
 #random-btn,
 #continue-btn{
-    /* width: 33.5vh; */
+    width: 100%;
     height: 26px;
     border-radius: 3px;
+    margin-bottom: 10px ;
 }
 
 #random-btn,
@@ -171,7 +173,6 @@ button:disabled{
     width: fit-content;
 
     padding: 40px;
-    margin-top: auto;
     flex: 1;
  
 }
@@ -205,9 +206,11 @@ button:disabled{
 }
 .no-ships-message{
     display: none;
+    
     color: #957eff;
     text-align: center;
-    margin-top: 50%;
+    padding-top: 50%;
+    opacity: 0.8;
 }
 
 .placed-ship{
@@ -279,14 +282,13 @@ button:disabled{
     align-items: center;
     color: var(--color);
 
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
 
     top: 0;
     left: 0;
-    z-index: 100;
-
+    z-index: 10;
 
     backdrop-filter: blur(100px);
 }
@@ -300,7 +302,7 @@ button:disabled{
 
 
 #play-again-btn{
-    width: 24vh;
+    width: 20vh;
     height: 25px;
 }
 
@@ -411,9 +413,13 @@ button:disabled{
         width: 20vh;
     }
 
-    #reset-btn,
-    #play-again-btn {
+    #reset-btn{
         width: 112%;
+        height: 35px;
+    }
+
+    #play-again-btn{
+        width: 100%;
         height: 35px;
     }
 
@@ -437,9 +443,7 @@ button:disabled{
     }
 
     .dashboard{
-        margin-top: 5%;
-        height: 510px;
-        width: 400px;
+        /* width: 400px; */
     }
 
     .ship-container > .board-cell{
@@ -451,9 +455,10 @@ button:disabled{
 
 
 /* FOOTER STYLING FOR DEVICES WITH DIFFERENT WIDTHS AND HEIGHTS */
-@media (min-height: 300px) and (max-width: 1200px){
+@media (min-height: 300px) and (max-width: 1200px) and (orientation: landscape){
     .footer{
         position: absolute;
+        margin-top: 50%;
     }
 }
 
@@ -461,6 +466,5 @@ button:disabled{
 @media (min-height: 300px) and (max-width: 1200px) and (orientation: landscape){
     .footer{
         position: absolute;
-        /* bottom: -150px; */
     }
 }       

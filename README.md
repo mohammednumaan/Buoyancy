@@ -114,10 +114,13 @@ All the assets can also be found [here](https://github.com/mohammednumaan/Buoyan
 
 This project is a **major refactor** of the previous version of this game. The changes include: 
 
-- New User Interface (responsive) and Color Theme. (Some viewports might have minor alignment issues. Additionally, running this application in the Safari Browser may cause style issues).
+- New User Interface (responsive) and Color Theme.
 - The entire `gameLogic` module and the core `DOM` functionalties implemented are asynchronous.
 - Implemented features that allows a player to play a 2-player game with a person or with a smart AI/bot.
 
 The older version of this game can be found [here](https://github.com/mohammednumaan/battleship). 
+> Some viewports might have minor alignment issues. Additionally, running this application in the Safari Browser may cause style issues.
 
-> Built By Mohammed Numaan.
+```
+Designed & Built By Mohammed Numaan.
+```

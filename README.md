@@ -119,7 +119,7 @@ This project is a **major refactor** of the previous version of this game. The c
 - Implemented features that allows a player to play a 2-player game with a person or with a smart AI/bot.
 
 The older version of this game can be found [here](https://github.com/mohammednumaan/battleship). 
-> Some viewports might have minor alignment issues. Additionally, running this application in certain browsers (Safari, DuckDuckGo) may cause some style issues.
+> Some viewports might have minor alignment issues. Running this application in certain browsers (Safari) may cause some style issues. Additionally, the DuckDuckGo browser renders some colors used in the application differently (in a different shade).
 
 ```
 Designed & Built By Mohammed Numaan.
